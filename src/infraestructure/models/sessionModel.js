@@ -31,7 +31,7 @@ const Session = connection.define('sesion', {
     defaultValue: 1  
   },
 }, {
-  tableName: 'curso',
+  tableName: 'sesion',
 });
 
 Session.belongsTo(Course, { foreignKey: 'idcurso', targetKey: 'idcurso' });
