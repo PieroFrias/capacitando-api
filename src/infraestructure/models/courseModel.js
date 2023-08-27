@@ -15,7 +15,7 @@ const Course = connection.define('curso', {
   },
   url_portada: {
     type: Sequelize.STRING(250),
-    allowNull: false,
+    allowNull: true,
   },
   url_video_intro: {
     type: Sequelize.STRING(250),
