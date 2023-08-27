@@ -13,7 +13,7 @@ const fileImage = (req, res) => {
     return res.status(400).json({ error: 'Ruta de imagen no encontrada' });
   }
 
-  const filePath = path.join(__dirname, `../../../src/infrastructure/storage/local/images/${folder}/${img}`);
+  const filePath = path.join(__dirname, `../../../src/infraestructure/storage/local/images/${folder}/${img}`);
 
   if (!fs.existsSync(filePath)) {
     res.status(404).json({ error: 'No se encontró el archivo' });
