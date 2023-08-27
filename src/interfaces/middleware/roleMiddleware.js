@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../../infrastructure/models/userModel.js";
+import User from "../../infraestructure/models/userModel.js";
 
 const checkRole = (role) => async (req, res, next) => {
   try {
@@ -13,7 +13,7 @@ const checkRole = (role) => async (req, res, next) => {
       },
     });
 
-    if (role.includes(user.role)) {
+    if (role.includes(user.rol)) {
       req.user = user;
       next();
     } else {
