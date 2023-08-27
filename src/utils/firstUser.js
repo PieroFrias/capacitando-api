@@ -1,4 +1,4 @@
-import User from "../infrastructure/data_access/userModel.js"
+import User from "../infrastructure/models/userModel.js"
 
 const creatAdmin = async () => {
   try {
