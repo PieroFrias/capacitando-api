@@ -18,6 +18,14 @@ class usersService {
       throw new Error("(SERVICE - getAllUsersAdmin) Error al obtener los usuarios: " + error.message);
     }
   }
+
+  async createUser(dataUser) {
+    try {
+      return await this.usersRepository.createUser(dataUser);
+    } catch (error) {
+      throw new Error("(SERVICE - createUser) Error al crear el usuario: " + error.message);
+    }
+  }
 }
 
 export default usersService;

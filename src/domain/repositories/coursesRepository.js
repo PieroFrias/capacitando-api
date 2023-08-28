@@ -11,26 +11,47 @@ class coursesRepository {
     this.connection = connection;
   }
 
-  async getAllCourses(dataFilter, page, pageSize, rol) {
+  async getAllCourses(dataFilter, page, pageSize, rol, userId) {
     try {
       const offset = (page - 1) * pageSize;
-
+  
       const { search, categoryId } = dataFilter;
-
       const categoryFilter = categoryId ? { idcategoria: categoryId } : {}; 
-
-      let filterConditions = [getWhereConditionByRol(rol)];
-      if (search) {
-        filterConditions.push({
-          [Op.or]: [
+  
+      let whereCondition = {};
+  
+      if (rol == 1) {
+        whereCondition = {
+          ...categoryFilter,
+        };
+  
+        if (search) {
+          whereCondition[Op.or] = [
             { titulo: { [Op.like]: `%${search}%` } },
             { descripcion: { [Op.like]: `%${search}%` } },
-          ],
+          ];
+        }
+      } else if (rol == 2 || rol == 3) {
+        const userCourses = await CourseUser.findAll({
+          where: { idusuario: userId },
         });
-      };
-
-      const whereCondition = { [Op.and]: filterConditions, };
-
+  
+        const courseIds = userCourses.map((userCourse) => userCourse.idcurso);
+  
+        whereCondition = {
+          estado: 1,
+          idcurso: courseIds,
+          ...categoryFilter,
+        };
+        
+        if (search) {
+          whereCondition[Op.or] = [
+            { titulo: { [Op.like]: `%${search}%` } },
+            { descripcion: { [Op.like]: `%${search}%` } },
+          ];
+        }
+      }
+  
       const courses = await Course.findAndCountAll({
         where: whereCondition,
         include: [{
@@ -42,9 +63,9 @@ class coursesRepository {
         limit: pageSize,
         distinct: true,
       });
-
+  
       if (courses.count <= 0) { return false; }
-
+  
       const coursesData = courses.rows.map((course) => ({
         idcurso: parseInt(course.idcurso),
         titulo: course.titulo,
@@ -55,15 +76,15 @@ class coursesRepository {
         estado: course.estado,
         hora_duracion: course.hora_duracion,
         total_clases: course.total_clases,
-
+  
         url_portada: course.url_portada
           ? `${process.env.DOMAIN}/${process.env.DATA}/cursos/${course.url_portada}`
           : null,
       }));
-
+  
       const totalItems = courses.count;
       const totalPages = Math.ceil(totalItems / pageSize);
-
+  
       return {
         coursesData,
         currentPage: page,
@@ -170,6 +191,56 @@ class coursesRepository {
     }
   }
 
+  async addCourseUser(idcurso, idusuario) {
+    try {
+      const course = await Course.findOne({
+        where: { idcurso, estado: 1 },
+      });
+
+      const user = await User.findOne({
+        where: { idusuario, estado: 1 },
+      });
+
+      if (!course || !user) { return false; }
+
+      const courseUser = await CourseUser.findOne({
+        where: { idcurso, idusuario },
+      });
+
+      if (courseUser) { return false; }
+
+      await CourseUser.create({ idcurso, idusuario });
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteCourseUser(idcurso, idusuario) {
+    try {
+      const course = await Course.findOne({
+        where: { idcurso, estado: 1 },
+      });
+
+      const user = await User.findOne({
+        where: { idusuario, estado: 1 },
+      });
+
+      if (!course || !user) { return false; }
+
+      const courseUser = await CourseUser.findOne({
+        where: { idcurso, idusuario },
+      });
+
+      if (!courseUser) { return false; }
+
+      await courseUser.destroy();
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async updateCourse(idcurso, dataCourse) {
     try {
       const course = await Course.findOne({
@@ -258,16 +329,6 @@ class coursesRepository {
       throw error;
     }
   }
-}
-
-function getWhereConditionByRol(rol) {
-  let whereCondition = {};
-
-  if (rol == 2 || rol == 3 || rol == null) {
-    whereCondition.estado = 1;
-  }
-
-  return whereCondition;
 }
 
 export default coursesRepository;
