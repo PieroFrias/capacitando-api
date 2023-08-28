@@ -11,47 +11,37 @@ class categoriesRepository {
         this.connection = connection;
     }
 
-    async getAllCategories(dataFilter, page, pageSize) {
+    async getAllCategories(dataFilter) {
         try {
-            const offset = (page - 1) * pageSize;
-
-            const { search, categoryId } = dataFilter;
-
-            const categoryFilter = {};
+            const { search } = dataFilter;
 
             let whereCondition = {};
 
             whereCondition = {
                 estado: 1,
-                ...categoryFilter,
             };
 
+            if (search) {
+                whereCondition.categoria = {
+                    [Op.like]: `%${search}%`,
+                };
+            }
 
-            const categories = await Category.findAndCountAll({
+            const categories = await Category.findAll({
                 where: whereCondition,
                 order: [["idcategoria", "ASC"]],
-                offset,
-                limit: pageSize,
-                distinct: true,
             });
 
-            if (categories.count <= 0) { return false; }
+            if (categories.length <= 0) { return false; }
 
-            const categoriesData = categories.rows.map((category) => ({
+            const categoriesData = categories.map((category) => ({
                 idcategoria: parseInt(category.idcategoria),
                 categoria: category.categoria,
                 estado: category.estado,
             }));
 
-            const totalItems = categories.count;
-            const totalPages = Math.ceil(totalItems / pageSize);
+            return categoriesData;
 
-            return {
-                categoriesData,
-                currentPage: page,
-                totalPages,
-                totalItems,
-            };
         } catch (error) {
             throw error;
         }
@@ -113,8 +103,6 @@ class categoriesRepository {
             if (categoria && categoria !== categorie.categoria) {
                 categorie.categoria = categoria;
             }
-
-            categorie.idcategoria = idcategoria;
 
             await categorie.save();
             return categorie;

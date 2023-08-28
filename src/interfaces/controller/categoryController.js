@@ -7,14 +7,11 @@ const categoriesService = new CategoriesService(categoriesRepository);
 
 const getAllCategories = async (req, res) => {
     try {
-        const { page, pageSize, ...dataFilter } = req.body;
+        const { ...dataFilter } = req.body;
 
-        const pageNumber = parseInt(page) || 1;
-        const limit = parseInt(pageSize) || 9;
+        const categories = await categoriesService.getAllCategories(dataFilter);
 
-        const categories = await categoriesService.getAllCategories(dataFilter, pageNumber, limit);
-
-        if (!categories || categories.categoriesData.length <= 0) {
+        if (!categories || categories.length <= 0) {
             res.status(404).json({ error: "No se encontraron categorias" });
         } else {
             res.json(categories);

@@ -14,17 +14,17 @@ class coursesRepository {
   async getAllCourses(dataFilter, page, pageSize, rol, userId) {
     try {
       const offset = (page - 1) * pageSize;
-  
+
       const { search, categoryId } = dataFilter;
-      const categoryFilter = categoryId ? { idcategoria: categoryId } : {}; 
-  
+      const categoryFilter = categoryId ? { idcategoria: categoryId } : {};
+
       let whereCondition = {};
-  
+
       if (rol == 1) {
         whereCondition = {
           ...categoryFilter,
         };
-  
+
         if (search) {
           whereCondition[Op.or] = [
             { titulo: { [Op.like]: `%${search}%` } },
@@ -35,15 +35,15 @@ class coursesRepository {
         const userCourses = await CourseUser.findAll({
           where: { idusuario: userId },
         });
-  
+
         const courseIds = userCourses.map((userCourse) => userCourse.idcurso);
-  
+
         whereCondition = {
           estado: 1,
           idcurso: courseIds,
           ...categoryFilter,
         };
-        
+
         if (search) {
           whereCondition[Op.or] = [
             { titulo: { [Op.like]: `%${search}%` } },
@@ -51,7 +51,7 @@ class coursesRepository {
           ];
         }
       }
-  
+
       const courses = await Course.findAndCountAll({
         where: whereCondition,
         include: [{
@@ -63,9 +63,9 @@ class coursesRepository {
         limit: pageSize,
         distinct: true,
       });
-  
+
       if (courses.count <= 0) { return false; }
-  
+
       const coursesData = courses.rows.map((course) => ({
         idcurso: parseInt(course.idcurso),
         titulo: course.titulo,
@@ -76,15 +76,15 @@ class coursesRepository {
         estado: course.estado,
         hora_duracion: course.hora_duracion,
         total_clases: course.total_clases,
-  
+
         url_portada: course.url_portada
           ? `${process.env.DOMAIN}/${process.env.DATA}/cursos/${course.url_portada}`
           : null,
       }));
-  
+
       const totalItems = courses.count;
       const totalPages = Math.ceil(totalItems / pageSize);
-  
+
       return {
         coursesData,
         currentPage: page,
@@ -97,7 +97,7 @@ class coursesRepository {
   }
 
   async getCourseDetail(id) {
-    try {      
+    try {
       const course = await Course.findOne({
         where: { estado: 1, idcurso: id, },
         include: [
@@ -129,24 +129,24 @@ class coursesRepository {
         estado: course.estado,
         hora_duracion: course.hora_duracion,
         total_clases: course.total_clases,
-        
+
         sesiones: course.sesions
-        .filter(isActiveSession)
-        .map((session) => ({
-          idsesion: parseInt(session.idsesion),
-          nombre_sesion: session.nombre_sesion,
-          descripcion_sesion: session.descripcion,
-          total_contenido: session.contenidos.filter(isActiveContent).length,
-          contenido: session.contenidos
-          .filter(isActiveContent)
-          .map((content) => ({
-            idcontenido: parseInt(content.idcontenido),
-            titulo: content.titulo,
-            descripcion_contenido: content.descripcion,
-            url_video: content.url_video,
-            minutos: content.minutos_video,
+          .filter(isActiveSession)
+          .map((session) => ({
+            idsesion: parseInt(session.idsesion),
+            nombre_sesion: session.nombre_sesion,
+            descripcion_sesion: session.descripcion,
+            total_contenido: session.contenidos.filter(isActiveContent).length,
+            contenido: session.contenidos
+              .filter(isActiveContent)
+              .map((content) => ({
+                idcontenido: parseInt(content.idcontenido),
+                titulo: content.titulo,
+                descripcion_contenido: content.descripcion,
+                url_video: content.url_video,
+                minutos: content.minutos_video,
+              })),
           })),
-        })),
 
         docentes: course.curso_usuarios
           .filter(isTeacher)

@@ -3,9 +3,9 @@ class categoriesService {
         this.categoriesRepository = categoriesRepository;
     }
 
-    async getAllCategories(dataFilter, page, pageSize) {
+    async getAllCategories(dataFilter) {
         try {
-            const categories = await this.categoriesRepository.getAllCategories(dataFilter, page, pageSize);
+            const categories = await this.categoriesRepository.getAllCategories(dataFilter);
             return categories;
         } catch (error) {
             throw new Error("(SERVICE - getAllCategories) Error al obtener las categorias: " + error.message);
