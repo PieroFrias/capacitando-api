@@ -3,9 +3,9 @@ class coursesService {
     this.coursesRepository = coursesRepository;
   }
 
-  async getAllCourses(dataFilter, page, pageSize, rol) {
+  async getAllCourses(dataFilter, page, pageSize, rol, userId) {
     try {
-      const courses = await this.coursesRepository.getAllCourses(dataFilter, page, pageSize, rol);
+      const courses = await this.coursesRepository.getAllCourses(dataFilter, page, pageSize, rol, userId);
       return courses;
     } catch (error) {
       throw new Error("(SERVICE - getAllCoursesAdmin) Error al obtener los cursos: " + error.message);
@@ -27,6 +27,24 @@ class coursesService {
       return course;
     } catch (error) {
       throw new Error("(SERVICE - createCourse) Error al crear el curso: " + error.message);
+    }
+  }
+
+  async addCourseUser(idcurso, idusuario) {
+    try {
+      const course = await this.coursesRepository.addCourseUser(idcurso, idusuario);
+      return course;
+    } catch (error) {
+      throw new Error("(SERVICE - addCourseUser) Error al asignar al usuario al curso: " + error.message);
+    }
+  }
+
+  async deleteCourseUser(idcurso, idusuario) {
+    try {
+      const course = await this.coursesRepository.deleteCourseUser(idcurso, idusuario);
+      return course;
+    } catch (error) {
+      throw new Error("(SERVICE - deleteCourseUser) Error al eliminar al usuario del curso: " + error.message);
     }
   }
 

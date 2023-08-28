@@ -48,7 +48,24 @@ const getAllUsersAdmin = async (req, res) => {
   }
 };
 
+const createUser = async (req, res) => {
+  try {
+    const dataUser = req.body;
+    const user = await userService.createUser(dataUser);
+
+    if (user) {
+      res.json({ message: "Usuario creado exitosamente" });
+    } else {
+      res.status(400).json({ error: "El nombre de usuario ya está en uso" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error en el servidor al crear el usuario (controller - createUser)" });
+  }
+}
+
 export {
   authenticateUser,
   getAllUsersAdmin,
+  createUser,
 };
