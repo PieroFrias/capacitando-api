@@ -12,11 +12,12 @@ const getAllCourses = async (req, res) => {
   try {
     const { page, pageSize, ...dataFilter } = req.body;
     const rol = req.user ? req.user.rol : null;
+    const userId = req.user ? req.user.idusuario : null;
 
     const pageNumber = parseInt(page) || 1;
     const limit = parseInt(pageSize) || 9;
 
-    const courses = await coursesService.getAllCourses(dataFilter, pageNumber, limit, rol);
+    const courses = await coursesService.getAllCourses(dataFilter, pageNumber, limit, rol, userId);
 
     if (!courses || courses.coursesData.length <= 0) {
       res.status(404).json({ error: "No se encontraron cursos" });
@@ -60,6 +61,38 @@ const createCourse = async (req, res) => {
     res.status(500).json({ error: "Ocurrió un error en el servidor (controller - createCourse)" });
   }
 };
+
+const addCourseUser = async (req, res) => {
+  try {
+    const { idcurso, idusuario } = req.body;
+    const course = await coursesService.addCourseUser(idcurso, idusuario);
+
+    if (course) {
+      res.json({ message: "Usuario asignado al curso exitosamente" });
+    } else {
+      res.status(404).json({ error: "No se pudo asignar el usuario al curso" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Ocurrió un error en servidor (controller - addCourseUser)" });
+  }
+}
+
+const deleteCourseUser = async (req, res) => {
+  try {
+    const { idcurso, idusuario } = req.body;
+    const course = await coursesService.deleteCourseUser(idcurso, idusuario);
+
+    if (course) {
+      res.json({ message: "Usuario eliminado del curso exitosamente" });
+    } else {
+      res.status(404).json({ error: "No se pudo eliminar el usuario del curso" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Ocurrió un error en servidor (controller - deleteCourseUser)" });
+  }
+}
 
 const updateCourse = async (req, res) => {
   try {
@@ -172,6 +205,8 @@ export {
   getAllCourses,
   getCourseDetail,
   createCourse,
+  addCourseUser,
+  deleteCourseUser,
   updateCourse,
   changeStatusCourse,
   addUpdateImageCourse,
