@@ -33,7 +33,6 @@ class usersRepository {
 
       let whereCondition = {};
       whereCondition = {
-        estado: 1,
         rol: {
           [Op.not]: 1,
         },
@@ -97,25 +96,83 @@ class usersRepository {
     }
   }
 
-  async updateUser(userId, dataUser, idUser) {
+  async getUserDetail(idusuario, userId, userRol) {
+    try {
+      const user = await User.findOne({
+        where: { idusuario, estado: 1 },
+        attributes: { exclude: ["password"] },
+      });
+
+      if (!user) { throw new Error('Usuario no encontrado'); }
+
+      if (userRol !== 1 && userId !== user.idusuario) {
+        throw new Error('No tienes permisos para ver este perfil');
+      }
+
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateUser(userId, dataUser, idUser, userRol) {
     try {
       const user = await User.findOne({
         where: { idusuario: userId, estado: 1 }
       });
 
-      const { usuario, currentPassword, newPassword } = dataUser;
-      const name = usuario ? await User.findOne({ where: { usuario, estado: 1 } }) : null;
+      const { 
+        usuario, 
+        currentPassword, 
+        newPassword,
+        nombre,
+        apellido,
+        telefono,
+        dni,
+        correo,
+        direccion,
+        carrera,
+        perfil,
+        rol,
+      } = dataUser;
 
-      if (!user || (name && name.id_usuario !== user.id_usuario) || idUser !== user.id_usuario) { 
-        return false; 
+      const name = usuario ? await User.findOne({ where: { usuario, estado: 1 } }) : null;
+      const email = correo ? await User.findOne({ where: { correo, estado: 1 } }) : null;
+
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+      
+      if (name && name.usuario !== user.usuario) {
+        throw new Error('El nombre de usuario ya está en uso');
+      }
+      
+      if (email && email.correo !== user.correo) {
+        throw new Error('La dirección de correo electrónico ya está en uso');
+      }
+      
+      if (userRol !== 1 && idUser !== user.idusuario) {
+        throw new Error('No tienes permisos para editar este perfil');
       }
 
       const comprobarPass = await user.comprobarPassword(currentPassword);
 
       if (!comprobarPass) { return false; }
 
-      user.usuario = usuario || user.usuario;
+      if ((usuario && usuario !== user.usuario) || (correo && correo !== user.correo)) {
+        user.usuario = usuario;
+        user.correo = correo;
+      }
+
       user.password = newPassword;
+      user.nombre = nombre || user.nombre;
+      user.apellido = apellido || user.apellido;
+      user.telefono = telefono || user.telefono;
+      user.dni = dni || user.dni;
+      user.direccion = direccion || user.direccion;
+      user.carrera = carrera || user.carrera;
+      user.perfil = perfil || user.perfil;
+      user.rol = rol || user.rol;
 
       await user.save();
       return user;
@@ -124,10 +181,45 @@ class usersRepository {
     }
   }
 
-  async deleteUser(userId) {
+  async addUpdateImageUser(idusuario, newImage) {
+    try {
+      if (!newImage) { return false; }
+
+      const user = await User.findOne({
+        where: { idusuario, estado: 1 },
+      });
+
+      user.foto = newImage;
+
+      await user.save();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteImageUser(idusuario) {
     try {
       const user = await User.findOne({
-        where: { id_usuario: userId, estado: 1 }
+        where: { idusuario, estado: 1, },
+      });
+
+      if (!user) { return false; }
+
+      const img = user.foto;
+
+      user.foto = null;
+      await user.save();
+      return img;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async changeStatusUser(idusuario) {
+    try {
+      const user = await User.findOne({
+        where: { idusuario, estado: 1 }
       });
 
       if (!user) { return false; }

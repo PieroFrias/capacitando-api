@@ -46,7 +46,6 @@ const User = connection.define('users', {
   foto: {
     type: Sequelize.STRING(250),
     allowNull: true,
-    unique: true,
   },
   carrera: {
     type: Sequelize.STRING(250),
