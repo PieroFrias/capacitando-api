@@ -96,20 +96,34 @@ class coursesRepository {
     }
   }
 
-  async getCourseDetail(id) {
-    try {      
+  async getCourseDetail(id, rol, userId) {
+    try {
+      let whereCondition = {};
+  
+      if (rol == 1) {
+        whereCondition = { idcurso: id };
+      }
+      else if (rol == 2 || rol == 3) {
+        const userCourses = await CourseUser.findAll({
+          where: { idusuario: userId },
+        });
+  
+        const courseIds = userCourses.map((userCourse) => userCourse.idcurso);
+  
+        if (!courseIds.includes(id)) { return false; }
+
+        whereCondition = { estado: 1, idcurso: courseIds, };
+      }
+
       const course = await Course.findOne({
-        where: { estado: 1, idcurso: id, },
+        where: whereCondition,
         include: [
           { model: Category, },
           {
             model: CourseUser,
             include: [{ model: User, where: { estado: 1 } }],
           },
-          {
-            model: Session,
-            include: [{ model: Content }]
-          }
+          { model: Session, include: [{ model: Content }] }
         ],
       });
 

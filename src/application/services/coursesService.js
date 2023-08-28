@@ -12,9 +12,9 @@ class coursesService {
     }
   }
 
-  async getCourseDetail(id) {
+  async getCourseDetail(id, rol, userId) {
     try {
-      const course = await this.coursesRepository.getCourseDetail(id);
+      const course = await this.coursesRepository.getCourseDetail(id, rol, userId);
       return course;
     } catch (error) {
       throw new Error("(SERVICE - getCourseDetail) Error al obtener el curso: " + error.message);

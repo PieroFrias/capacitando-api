@@ -32,8 +32,10 @@ const getAllCourses = async (req, res) => {
 
 const getCourseDetail = async (req, res) => {
   try {
+    const rol = req.user ? req.user.rol : null;
+    const userId = req.user ? req.user.idusuario : null;
     const { id } = req.params;
-    const course = await coursesService.getCourseDetail(id);
+    const course = await coursesService.getCourseDetail(id, rol, userId)
 
     if (!course) {
       res.status(404).json({ error: "No se encontró el curso" });
@@ -159,7 +161,7 @@ const deleteImageCourse = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error en el servidor (controller - deleteImageTown)" });
+    res.status(500).json({ error: "Error en el servidor (controller - deleteImageCourse)" });
   }
 };
 
