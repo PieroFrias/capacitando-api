@@ -21,8 +21,8 @@ const Session = connection.define('sesion', {
     type: Sequelize.INTEGER,
     allowNull: false,
     references:{
-        model: Course,
-        key: 'idcurso'
+      model: Course,
+      key: 'idcurso'
     }
   },
   estado: {

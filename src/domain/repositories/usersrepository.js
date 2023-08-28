@@ -34,6 +34,9 @@ class usersRepository {
       let whereCondition = {};
       whereCondition = {
         estado: 1,
+        rol: {
+          [Op.not]: 1,
+        },
         ...rolFilter,
       };
       
@@ -72,6 +75,67 @@ class usersRepository {
         totalPages,
         totalItems,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createUser(dataUser) {
+    try {
+      const { usuario } = dataUser;
+
+      const userExists = await User.findOne({
+        where: { usuario, estado: 1, },
+      });
+
+      if (userExists) { return false; }
+
+      const user = await User.create(dataUser);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateUser(userId, dataUser, idUser) {
+    try {
+      const user = await User.findOne({
+        where: { idusuario: userId, estado: 1 }
+      });
+
+      const { usuario, currentPassword, newPassword } = dataUser;
+      const name = usuario ? await User.findOne({ where: { usuario, estado: 1 } }) : null;
+
+      if (!user || (name && name.id_usuario !== user.id_usuario) || idUser !== user.id_usuario) { 
+        return false; 
+      }
+
+      const comprobarPass = await user.comprobarPassword(currentPassword);
+
+      if (!comprobarPass) { return false; }
+
+      user.usuario = usuario || user.usuario;
+      user.password = newPassword;
+
+      await user.save();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteUser(userId) {
+    try {
+      const user = await User.findOne({
+        where: { id_usuario: userId, estado: 1 }
+      });
+
+      if (!user) { return false; }
+
+      user.estado = 0;
+
+      await user.save();
+      return true;
     } catch (error) {
       throw error;
     }
