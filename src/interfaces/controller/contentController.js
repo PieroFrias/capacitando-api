@@ -68,7 +68,7 @@ const updateContent = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - updateSession)" });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - updateContent)" });
   }
 }
 
