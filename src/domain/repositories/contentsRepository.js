@@ -117,7 +117,7 @@ class contentsRepository {
       });
 
       course.total_clases = course.total_clases + 1; 
-      course.hora_duracion = (course.hora_duracion + content.minutos_video) / 60;
+      course.hora_duracion = ((course.hora_duracion * 60) + content.minutos_video) / 60;
       await course.save();
 
       return content;
@@ -181,12 +181,18 @@ class contentsRepository {
     try {
       const content = await Content.findOne({
         where: { idcontenido, estado: 1 },
+        include: [Resource],
       });
 
       if (!content) { return false; }
 
       content.estado = 0;
       await content.save();
+
+      for (const resource of content.recursos) {
+        resource.estado = 0;
+        await resource.save();
+      }
 
       const session = await Session.findOne({
         where: { idsesion: content.idsesion },

@@ -1,6 +1,7 @@
 import express from "express";
 import checkAuth from '../middleware/authMiddleware.js';
 import checkRole from '../middleware/roleMiddleware.js';
+import { validateStatus } from "../middleware/validators/statusValidator.js";
 import {
   getAllCourses,
   getAllCoursesPaginated,
@@ -27,7 +28,7 @@ router.post("/add/user", checkAuth, checkRole([1]), addCourseUser);
 router.patch("/update/:id", checkAuth, checkRole([1]), updateCourse);
 
 router.put("/image/:id", checkAuth, checkRole([1]), uploadImage.single("url_portada"), addUpdateImageCourse);
-router.put("/status/:id", checkAuth, checkRole([1]), changeStatusCourse);
+router.put("/status/:id", checkAuth, checkRole([1]), validateStatus, changeStatusCourse);
 
 router.delete("/delete/user", checkAuth, checkRole([1]), deleteCourseUser);
 router.delete("/delete/image/:id", checkAuth, checkRole([1]), deleteImageCourse);

@@ -86,8 +86,8 @@ const createUser = async (req, res) => {
 const getUserDetail = async (req, res) => {
   try {
     const { id } = req.params;
-    const userRol = req.user.rol;
     const userId = req.user.idusuario;
+    const userRol = req.user.rol;
     const user = await usersService.getUserDetail(id, userId, userRol);
 
     if (!user) {
@@ -154,8 +154,10 @@ const changeStatusUser = async (req, res) => {
 const addUpdateImageUser = async (req, res) => {
   try {
     const { id } = req.params;
+    const idUser = req.user.idusuario;
+    const userRol = req.user.rol;
     const newImage = req.file ? req.file.filename : null;
-    const imageUser = await usersService.addUpdateImageUser(id, newImage);
+    const imageUser = await usersService.addUpdateImageUser(id, newImage, idUser, userRol);
 
     if (imageUser) {
       res.json({ message: "Imágen cargada exitosamente" });
@@ -163,18 +165,20 @@ const addUpdateImageUser = async (req, res) => {
       res.status(404).json({ error: "No se pudo cargar la imágen" });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - addUpdateImageUser)" });
+    console.error("Error en el servidor al actualizar el usuario (controller - addUpdateImageUser)");
+    res.status(500).json({ error: error.message });
   }
 };
 
 const deleteImageUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const img = await usersService.deleteImageUser(id);
+    const idUser = req.user.idusuario;
+    const userRol = req.user.rol;
+    const img = await usersService.deleteImageUser(id, idUser, userRol);
 
     if (img) {
-      const imgRoute = `src/infraestructure/storage/local/images/usuarios/${img}`;
+      const imgRoute = `src/infraestructure/storage/local/usuarios/${img}`;
       deleteImage(imgRoute);
 
       res.json({ message: "Imagen eliminada correctamente" });
@@ -182,20 +186,22 @@ const deleteImageUser = async (req, res) => {
       res.status(404).json({ error: "Imagen asociada no encontrada" });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error en el servidor (controller - deleteImageUser)" });
+    console.error("Error en el servidor al actualizar el usuario (controller - deleteImageUser)");
+    res.status(500).json({ error: error.message });
   }
 };
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "src/infraestructure/storage/local/images/usuarios");
+    cb(null, "src/infraestructure/storage/local/usuarios");
   },
 
   filename: async (req, file, cb) => {
     try {
       const { id } = req.params;
-      const user = await usersService.getUserDetail(id);
+      const userId = req.user.idusuario;
+      const userRol = req.user.rol;
+      const user = await usersService.getUserDetail(id, userId, userRol);
       const userName = user.usuario.toLowerCase().replace(/\s/g, "_");
       const extention = path.extname(file.originalname);
       const imgName = `${userName}${extention}`;
