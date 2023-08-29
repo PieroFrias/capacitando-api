@@ -88,8 +88,4 @@ import('./courseUserModel.js').then((CourseUser) => {
   User.hasMany(CourseUser.default, { foreignKey: 'idusuario' });
 });
 
-import('./contentViewModel.js').then((ContentView) => {
-  User.hasMany(ContentView.default, { foreignKey: 'idusuario' });
-});
-
 export default User;

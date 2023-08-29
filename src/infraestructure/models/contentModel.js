@@ -48,8 +48,4 @@ import('./resourceModel.js').then((Resource) => {
   Content.hasMany(Resource.default, { foreignKey: 'idcontenido' });
 });
 
-import('./contentViewModel.js').then((ContentView) => {
-  Content.hasMany(ContentView.default, { foreignKey: 'idcontenido' });
-});
-
 export default Content;
