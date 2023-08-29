@@ -11,7 +11,80 @@ class coursesRepository {
     this.connection = connection;
   }
 
-  async getAllCourses(dataFilter, page, pageSize, rol, userId) {
+  async getAllCourses(dataFilter, rol, userId) {
+    try {
+      const { search, categoryId } = dataFilter;
+      const categoryFilter = categoryId ? { idcategoria: categoryId } : {};
+
+      let whereCondition = {};
+
+      if (rol == 1) {
+        whereCondition = {
+          ...categoryFilter,
+        };
+
+        if (search) {
+          whereCondition[Op.or] = [
+            { titulo: { [Op.like]: `%${search}%` } },
+            { descripcion: { [Op.like]: `%${search}%` } },
+          ];
+        }
+      } else if (rol == 2 || rol == 3) {
+        const userCourses = await CourseUser.findAll({
+          where: { idusuario: userId },
+        });
+
+        const courseIds = userCourses.map((userCourse) => userCourse.idcurso);
+
+        whereCondition = {
+          estado: 1,
+          idcurso: courseIds,
+          ...categoryFilter,
+        };
+
+        if (search) {
+          whereCondition[Op.or] = [
+            { titulo: { [Op.like]: `%${search}%` } },
+            { descripcion: { [Op.like]: `%${search}%` } },
+          ];
+        }
+      }
+
+      const courses = await Course.findAll({
+        where: whereCondition,
+        include: [{
+          model: Category,
+          where: categoryFilter,
+        }],
+        order: [["updated_at", "DESC"]],
+        distinct: true,
+      });
+
+      if (courses.length <= 0) { return false; }
+
+      const coursesData = courses.map((course) => ({
+        idcurso: parseInt(course.idcurso),
+        titulo: course.titulo,
+        descripcion: course.descripcion,
+        categoria: course.categorium.categoria,
+        idcategoria: parseInt(course.categorium.idcategoria),
+        url_video_intro: course.url_video_intro,
+        estado: course.estado,
+        hora_duracion: course.hora_duracion,
+        total_clases: course.total_clases,
+
+        url_portada: course.url_portada
+          ? `${process.env.DOMAIN}/${process.env.DATA}/cursos/${course.url_portada}`
+          : null,
+      }));
+
+      return coursesData;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllCoursesPaginated(dataFilter, page, pageSize, rol, userId) {
     try {
       const offset = (page - 1) * pageSize;
 
