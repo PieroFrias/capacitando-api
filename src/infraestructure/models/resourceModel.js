@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import Content from './contentModel.js';
 import connection from '../config/db.js';
 
-const Resource = connection.define('sesion', {
+const Resource = connection.define('recurso', {
   idrecurso: {
     type: Sequelize.INTEGER,
     primaryKey: true,
@@ -12,15 +12,7 @@ const Resource = connection.define('sesion', {
     type: Sequelize.STRING(200),
     allowNull: false,
   },
-  tipo_recurso: {
-    type: Sequelize.STRING(45),
-    allowNull: true,
-  },
   url: {
-    type: Sequelize.STRING(200),
-    allowNull: false,
-  },
-  archivo: {
     type: Sequelize.STRING(200),
     allowNull: false,
   },
@@ -28,8 +20,8 @@ const Resource = connection.define('sesion', {
     type: Sequelize.INTEGER,
     allowNull: false,
     references:{
-        model: Content,
-        key: 'idcontenido'
+      model: Content,
+      key: 'idcontenido'
     }
   },
   estado: {
@@ -38,7 +30,7 @@ const Resource = connection.define('sesion', {
     defaultValue: 1  
   },
 }, {
-  tableName: 'curso',
+  tableName: 'recurso',
 });
 
 Resource.belongsTo(Content, { foreignKey: 'idcontenido', targetKey: 'idcontenido' });

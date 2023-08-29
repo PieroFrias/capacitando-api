@@ -1,76 +1,70 @@
-import SessionsRepository from "../../domain/repositories/sessionsRepository.js";
-import SessionsService from "../../application/services/sessionsService.js";
+import ContentsRepository from "../../domain/repositories/contentsRepository.js";
+import ContentsService from "../../application/services/contentsService.js";
 import connection from "../../infraestructure/config/db.js";
 
-const sessionsRepository = new SessionsRepository(connection);
-const sessionsService = new SessionsService(sessionsRepository);
+const contentsRepository = new ContentsRepository(connection);
+const contentsService = new ContentsService(contentsRepository);
 
-const getAllSessions = async (req, res) => {
+const getAllContents = async (req, res) => {
   try {
-    const rol = req.user ? req.user.rol : null;
-    const userId = req.user ? req.user.idusuario : null;
     const { id } = req.params;
     const { ...dataSearch } = req.body;
 
-    const sessions = await sessionsService.getAllSessions(id, dataSearch, userId, rol);
+    const contents = await contentsService.getAllContents(id, dataSearch);
 
-    if (!sessions || sessions.length <= 0) {
-      res.status(404).json({ error: "No se encontraron sesiones" });
+    if (!contents || contents.length <= 0) {
+      res.status(404).json({ error: "No se encontró contenido" });
     } else {
-      res.json(sessions);
+      res.json(contents);
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - getAllSessions)" });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - getAllContents)" });
   }
 };
 
-const getSessionDetail = async (req, res) => {
+const getContentDetail = async (req, res) => {
   try {
-    const rol = req.user ? req.user.rol : null;
-    const userId = req.user ? req.user.idusuario : null;
     const { id } = req.params;
-    const session = await sessionsService.getSessionDetail(id, userId, rol);
+    const content = await contentsService.getContentDetail(id);
     
-    if (!session) {
-      res.status(404).json({ error: "No se encontró la sesión" });
+    if (!content) {
+      res.status(404).json({ error: "No se encontró el contenido" });
     } else {
-      res.json(session);
+      res.json(content);
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - getSessionDetail)" });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - getContentDetail)" });
   }
 }
 
-const createSession = async (req, res) => {
+const createContent = async (req, res) => {
   try {
-    const userId = req.user ? req.user.idusuario : null;
-    const dataSession = req.body;
-    const session = await sessionsService.createSession(dataSession, userId);
+    const dataContent = req.body;
+    const content = await contentsService.createContent(dataContent);
     
-    if (!session) {
-      res.status(400).json({ error: "No se pudo registrar, verifica si la sesión ya existe o si usted está asignado al curso." });
+    if (!content) {
+      res.status(400).json({ error: "No se pudo registrar, verifica si el contenido ya existe." });
     } else {
-      res.json({ message: "Sesión registrada exitosamente" });
+      res.json({ message: "Contenido registrado exitosamente" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - createSession)" });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - createContent)" });
   }
 }
 
-const updateSession = async (req, res) => {
+const updateContent = async (req, res) => {
   try {
-    const userId = req.user ? req.user.idusuario : null;
     const { id } = req.params;
-    const dataSession = req.body;
-    const session = await sessionsService.updateSession(id, dataSession, userId);
+    const dataContent = req.body;
+    const content = await contentsService.updateContent(id, dataContent);
     
-    if (!session) {
-      res.status(400).json({ error: "No se pudo actualizar, verifica si la sesión ya existe o si usted está asignado al curso." });
+    if (!content) {
+      res.status(400).json({ error: "No se pudo actualizar, verifica si el contenido ya existe." });
     } else {
-      res.json({ message: "Sesión actualizada exitosamente" });
+      res.json({ message: "Contenido actualizado exitosamente" });
     }
   } catch (error) {
     console.error(error);
@@ -78,27 +72,26 @@ const updateSession = async (req, res) => {
   }
 }
 
-const changeStatusSession = async (req, res) => {
+const changeStatusContent = async (req, res) => {
   try {
-    const userId = req.user ? req.user.idusuario : null;
     const { id } = req.params;
-    const session = await sessionsService.changeStatusSession(id, userId);
+    const content = await contentsService.changeStatusContent(id);
     
-    if (!session) {
-      res.status(400).json({ error: "No se pudo deshabilitar la sesión, verifica si la sesión existe o si usted está asignado al curso." });
+    if (!content) {
+      res.status(400).json({ error: "No se pudo deshabilitar el contenido, verifica si el contenido existe." });
     } else {
-      res.json({ message: "Sesión deshabilitada exitosamente" });
+      res.json({ message: "Contenido deshabilitado exitosamente" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - changeStatusSession)" });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - changeStatusContent)" });
   }
 }
 
 export {
-  getAllSessions,
-  getSessionDetail,
-  createSession,
-  updateSession,
-  changeStatusSession,
+  getAllContents,
+  getContentDetail,
+  createContent,
+  updateContent,
+  changeStatusContent,
 };

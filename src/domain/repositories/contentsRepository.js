@@ -1,161 +1,210 @@
 import { Op } from "sequelize";
+import Content from "../../infraestructure/models/contentModel.js";
 import Session from "../../infraestructure/models/sessionModel.js";
 import Course from "../../infraestructure/models/courseModel.js";
-import CourseUser from "../../infraestructure/models/courseUserModel.js";
+import Resource from "../../infraestructure/models/resourceModel.js";
 
-class sessionsRepository {
+class contentsRepository {
   constructor(connection) {
     this.connection = connection;
   }
 
-  async getAllSessions(id_curso, dataSearch, userId, rol) {
+  async getAllContents(idsesion, dataSearch) {
     try {
-      if (rol !== 1) {
-        const isUserAssignedToCourse = await CourseUser.findOne({
-          where: { idcurso: id_curso, idusuario: userId },
-        });
-  
-        if (!isUserAssignedToCourse) { return false; }
-      }
-
-      let whereCondition = { estado: 1, idcurso: id_curso, };
+      let whereCondition = { estado: 1, idsesion: idsesion, };
 
       const { search } = dataSearch;
       if (search) {
         whereCondition[Op.or] = [
-          { nombre_sesion: { [Op.like]: `%${search}%` } },
+          { titulo: { [Op.like]: `%${search}%` } },
           { descripcion: { [Op.like]: `%${search}%` } },
         ];
       };
 
-      const sessions = await Session.findAll({
+      const contents = await Content.findAll({
         where: whereCondition,
-        include: [Course],
-        order: [["idsesion", "DESC"]],
-        distinct: true,
+        include: [Session, Resource],
+        order: [["idcontenido", "DESC"]],
       });
 
-      if (sessions.length <= 0) { return false; }
+      if (contents.length <= 0) { return false; }
 
-      const sessionsData = sessions.map((session) => ({
-        idsesion: parseInt(session.idsesion),
-        nombre_sesion: session.nombre_sesion,
-        descripcion: session.descripcion,
-        curso: session.curso.titulo,
-        idcurso: parseInt(session.idcurso),
-        estado: session.estado,
+      const contentsData = contents.map((content) => ({
+        idcontenido: parseInt(content.idcontenido),
+        titulo: content.titulo,
+        descripcion: content.descripcion,
+        sesion: content.sesion.nombre_sesion,
+        idsesion: parseInt(content.sesion.idsesion),
+
+        recursos: content.recursos
+        .filter((resource) => resource.estado == 1)
+        .map((resource) => ({
+          idrecurso: parseInt(resource.idrecurso),
+          nombre: resource.nombre,
+          tipo_recurso: resource.tipo_recurso,
+          url: resource.url ? resource.url : null,
+          archivo: resource.archivo ? resource.archivo : null,
+          estado: resource.estado,
+        })),
+
+        url_video: content.url_video,
+        minutos_video: content.minutos_video,
+        estado: content.estado,
       }));
 
-      return sessionsData;
+      return contentsData;
     } catch (error) {
       throw error;
     }
   }
 
-  async getSessionDetail(idsesion, userId, rol) {
+  async getContentDetail(idcontenido) {
     try {
-      const session = await Session.findOne({
-        where: { estado: 1, idsesion, },
-        include: [Course],
+      const content = await Content.findOne({
+        where: { estado: 1, idcontenido, },
+        include: [Session, Resource],
       });
 
-      if (!session) { return false; }
+      if (!content) { return false; }
 
-      if (rol !== 1) {
-        const isUserAssignedToCourse = await CourseUser.findOne({
-          where: { idcurso: session.idcurso, idusuario: userId },
-        });
-  
-        if (!isUserAssignedToCourse) { return false; }
-      }
+      const contentData = {
+        idcontenido: parseInt(content.idcontenido),
+        titulo: content.titulo,
+        descripcion: content.descripcion,
+        sesion: content.sesion.sesion,
+        idsesion: parseInt(content.sesion.idsesion),
 
-      const sessionData = {
-        idsesion: parseInt(session.idsesion),
-        nombre_sesion: session.nombre_sesion,
-        descripcion: session.descripcion,
-        curso: session.curso.titulo,
-        idcurso: parseInt(session.idcurso),
-        estado: session.estado,
+        recursos: content.recursos
+        .filter((resource) => resource.estado == 1)
+        .map((resource) => ({
+          idrecurso: parseInt(resource.idrecurso),
+          nombre: resource.nombre,
+          tipo_recurso: resource.tipo_recurso,
+          url: resource.url ? resource.url : null,
+          archivo: resource.archivo ? resource.archivo : null,
+          estado: resource.estado,
+        })),
+
+        url_video: content.url_video,
+        minutos_video: content.minutos_video,
+        estado: content.estado,
       };
 
-      return sessionData;
+      return contentData;
     } catch (error) {
       throw error;
     }
   }
 
-  async createSession(dataSession, userId) {
+  async createContent(dataContent) {
     try {
-      const { nombre_sesion, idcurso } = dataSession;
+      const { titulo } = dataContent;
 
-      const isUserAssignedToCourse = await CourseUser.findOne({
-        where: { idcurso, idusuario: userId },
+      const contentExists = await Content.findOne({
+        where: { titulo, estado: 1 },
       });
 
-      const sessionExists = await Session.findOne({
-        where: { nombre_sesion, estado: 1 },
-      });
+      if (contentExists) { return false; }
 
-      if (!isUserAssignedToCourse || sessionExists) { return false; }
+      const content = await Content.create(dataContent);
 
-      const session = await Session.create(dataSession);
-      return session;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async updateSession(idsesion, dataSession, userId) {
-    try {
       const session = await Session.findOne({
-        where: { idsesion, estado: 1 },
+        where: { idsesion: content.idsesion },
       });
 
-      const isUserAssignedToCourse = await CourseUser.findOne({
-        where: { idcurso: session.idcurso, idusuario: userId },
+      const course = await Course.findOne({
+        where: { idcurso: session.idcurso },
       });
 
-      if (!isUserAssignedToCourse) { return false; }
+      course.total_clases = course.total_clases + 1; 
+      course.hora_duracion = (course.hora_duracion + content.minutos_video) / 60;
+      await course.save();
 
-      const { nombre_sesion, descripcion, } = dataSession;
+      return content;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-      const sessionName = nombre_sesion ? await Session.findOne({ where: { nombre_sesion, estado: 1 } }) : null;
+  async updateContent(idcontenido, dataContent) {
+    try {
+      const content = await Content.findOne({
+        where: { idcontenido, estado: 1 },
+      });
 
-      if (!session || (sessionName && sessionName.nombre_sesion !== session.nombre_sesion)) {
+      const current_min_video = content.minutos_video;
+
+      const { 
+        titulo, 
+        descripcion, 
+        url_video,
+        minutos_video,
+      } = dataContent;
+
+      const contentTitle = titulo ? await Content.findOne({ where: { titulo, estado: 1 } }) : null;
+
+      if (!content || (contentTitle && contentTitle.titulo !== content.titulo)) {
         return false;
       }
 
-      if (nombre_sesion && nombre_sesion !== session.nombre_sesion) {
-        session.nombre_sesion = nombre_sesion;
+      if (titulo && titulo !== content.titulo) {
+        content.titulo = titulo;
       }
-      session.descripcion = descripcion;
+      content.descripcion = descripcion;
+      content.url_video = url_video;
+      content.minutos_video = minutos_video;
+      await content.save();
 
-      await session.save();
-      return session;
+      const session = await Session.findOne({
+        where: { idsesion: content.idsesion },
+      });
+
+      const course = await Course.findOne({
+        where: { idcurso: session.idcurso },
+      });
+
+      if (current_min_video > minutos_video) {
+        course.hora_duracion = ((course.hora_duracion * 60) - (current_min_video - minutos_video)) / 60;
+      } else if (current_min_video < minutos_video) {
+        course.hora_duracion = ((course.hora_duracion * 60) + (minutos_video - current_min_video)) / 60;
+      }
+
+      await course.save();
+
+      return content;
     } catch (error) {
       throw error;
     }
   }
 
-  async changeStatusSession(idsesion, userId) {
+  async changeStatusContent(idcontenido) {
     try {
+      const content = await Content.findOne({
+        where: { idcontenido, estado: 1 },
+      });
+
+      if (!content) { return false; }
+
+      content.estado = 0;
+      await content.save();
+
       const session = await Session.findOne({
-        where: { idsesion, estado: 1 },
+        where: { idsesion: content.idsesion },
       });
 
-      const isUserAssignedToCourse = await CourseUser.findOne({
-        where: { idcurso: session.idcurso, idusuario: userId },
+      const course = await Course.findOne({
+        where: { idcurso: session.idcurso },
       });
 
-      if (!isUserAssignedToCourse || !session) { return false; }
+      course.total_clases = course.total_clases - 1;
+      course.hora_duracion = ((course.hora_duracion * 60) - (content.minutos_video)) / 60;
+      await course.save();
 
-      session.estado = 0;
-      await session.save();
-      return session;
+      return content;
     } catch (error) {
       throw error;
     }
   }
 }
 
-export default sessionsRepository;
+export default contentsRepository;

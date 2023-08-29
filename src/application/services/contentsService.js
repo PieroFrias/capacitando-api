@@ -1,53 +1,52 @@
-class sessionsService {
-    constructor(sessionsRepository) {
-      this.sessionsRepository = sessionsRepository;
-    }
-  
-    async getAllSessions(id, dataSearch, userId, rol) {
-      try {
-        const sessions = await this.sessionsRepository.getAllSessions(id, dataSearch, userId, rol);
-        return sessions;
-      } catch (error) {
-        throw new Error("(SERVICE - getAllSessions) Error al obtener las sesiones: " + error.message);
-      }
-    }
+class contentsService {
+  constructor(contentsRepository) {
+    this.contentsRepository = contentsRepository;
+  }
 
-    async getSessionDetail(id, userId, rol) {
-      try {
-        const session = await this.sessionsRepository.getSessionDetail(id, userId, rol);
-        return session;
-      } catch (error) {
-        throw new Error("(SERVICE - getSessionDetail) Error al obtener la sesión: " + error.message);
-      }
-    }
-
-    async createSession(dataSession, userId) {
-      try {
-        const session = await this.sessionsRepository.createSession(dataSession, userId);
-        return session;
-      } catch (error) {
-        throw new Error("(SERVICE - createSession) Error al crear la sesión: " + error.message);
-      }
-    }
-
-    async updateSession(idsesion, dataSession, userId) {
-      try {
-        const session = await this.sessionsRepository.updateSession(idsesion, dataSession, userId);
-        return session;
-      } catch (error) {
-        throw new Error("(SERVICE - updateSession) Error al actualizar la sesión: " + error.message);
-      }
-    }
-
-    async changeStatusSession(idsesion, userId) {
-      try {
-        const session = await this.sessionsRepository.changeStatusSession(idsesion, userId);
-        return session;
-      } catch (error) {
-        throw new Error("(SERVICE - changeStatusSession) Error al deshabilitar de la sesión: " + error.message);
-      }
+  async getAllContents(idsesion, dataSearch) {
+    try {
+      const contents = await this.contentsRepository.getAllContents(idsesion, dataSearch);
+      return contents;
+    } catch (error) {
+      throw new Error("(SERVICE - getAllContents) Error al obtener el contenido: " + error.message);
     }
   }
-  
-  export default sessionsService;
-  
+
+  async getContentDetail(idcontenido) {
+    try {
+      const content = await this.contentsRepository.getContentDetail(idcontenido);
+      return content;
+    } catch (error) {
+      throw new Error("(SERVICE - getContentDetail) Error al obtener el contenido: " + error.message);
+    }
+  }
+
+  async createContent(dataContent) {
+    try {
+      const content = await this.contentsRepository.createContent(dataContent);
+      return content;
+    } catch (error) {
+      throw new Error("(SERVICE - createContent) Error al crear el contenido: " + error.message);
+    }
+  }
+
+  async updateContent(idcontenido, dataContent) {
+    try {
+      const content = await this.contentsRepository.updateContent(idcontenido, dataContent);
+      return content;
+    } catch (error) {
+      throw new Error("(SERVICE - updateContent) Error al actualizar el contenido: " + error.message);
+    }
+  }
+
+  async changeStatusContent(idcontenido) {
+    try {
+      const content = await this.contentsRepository.changeStatusContent(idcontenido);
+      return content;
+    } catch (error) {
+      throw new Error("(SERVICE - changeStatusContent) Error al cambiar el estado del contenido: " + error.message);
+    }
+  }
+}
+
+export default contentsService;
