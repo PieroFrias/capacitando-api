@@ -337,8 +337,6 @@ class coursesRepository {
       const {
         titulo,
         url_video_intro,
-        hora_duracion,
-        total_clases,
         descripcion,
         idcategoria,
       } = dataCourse;
@@ -353,8 +351,6 @@ class coursesRepository {
         course.titulo = titulo;
       }
       course.url_video_intro = url_video_intro;
-      course.hora_duracion = hora_duracion;
-      course.total_clases = total_clases;
       course.descripcion = descripcion;
       course.idcategoria = idcategoria;
 
@@ -400,17 +396,17 @@ class coursesRepository {
     }
   }
 
-  async changeStatusCourse(idcurso) {
+  async changeStatusCourse(idcurso, estado) {
     try {
       const course = await Course.findOne({
-        where: { idcurso, estado: 1 },
+        where: { idcurso },
       });
 
       if (!course) { return false; }
 
-      course.estado = 0;
-
+      course.estado = estado;
       await course.save();
+      
       return course;
     } catch (error) {
       throw error;

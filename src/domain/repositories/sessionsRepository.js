@@ -2,6 +2,8 @@ import { Op } from "sequelize";
 import Session from "../../infraestructure/models/sessionModel.js";
 import Course from "../../infraestructure/models/courseModel.js";
 import CourseUser from "../../infraestructure/models/courseUserModel.js";
+import Content from "../../infraestructure/models/contentModel.js";
+import Resource from "../../infraestructure/models/resourceModel.js";
 
 class sessionsRepository {
   constructor(connection) {
@@ -56,7 +58,7 @@ class sessionsRepository {
     try {
       const session = await Session.findOne({
         where: { estado: 1, idsesion, },
-        include: [Course],
+        include: [Course, Content],
       });
 
       if (!session) { return false; }
@@ -75,6 +77,16 @@ class sessionsRepository {
         descripcion: session.descripcion,
         curso: session.curso.titulo,
         idcurso: parseInt(session.idcurso),
+
+        contenidos: session.contenidos
+        .filter((content) => content.estado == 1)
+        .map((content) => ({
+          idcontenido: parseInt(content.idcontenido),
+          titulo: content.titulo,
+          descripcion: content.descripcion,
+          estado: content.estado,
+        })),
+
         estado: session.estado,
       };
 
@@ -141,16 +153,46 @@ class sessionsRepository {
     try {
       const session = await Session.findOne({
         where: { idsesion, estado: 1 },
+        include: [
+          {
+            model: Content,
+            include: [{ model: Resource }]
+          },
+          {
+            model: Course
+          }
+        ],
       });
+
+      if (!session) { return false; }
 
       const isUserAssignedToCourse = await CourseUser.findOne({
         where: { idcurso: session.idcurso, idusuario: userId },
       });
 
-      if (!isUserAssignedToCourse || !session) { return false; }
+      if (!isUserAssignedToCourse) { return false; }
 
       session.estado = 0;
       await session.save();
+      
+      for (const content of session.contenidos) {
+        content.estado = 0;
+        await content.save();
+  
+        for (const resource of content.recursos) {
+          resource.estado = 0;
+          await resource.save();
+        }
+      }
+
+      const course = await Course.findOne({
+        where: { idcurso: session.idcurso },
+      });
+
+      course.total_clases -= session.contenidos.length;
+      course.hora_duracion = ((course.hora_duracion * 60) - session.contenidos.reduce((sum, content) => sum + content.minutos_video, 0)) / 60;
+  
+      await course.save();
       return session;
     } catch (error) {
       throw error;

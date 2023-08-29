@@ -134,10 +134,11 @@ const updateCourse = async (req, res) => {
 const changeStatusCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    const course = await coursesService.changeStatusCourse(id);
+    const { estado } = req.body;
+    const course = await coursesService.changeStatusCourse(id, estado);
 
     if (course) {
-      res.json({ message: "Curso deshabilitado exitosamente" });
+      res.json({ message: "Estado del curso cambiado exitosamente" });
     } else {
       res.status(404).json({ error: "Curso no encontrado" });
     }
@@ -185,7 +186,7 @@ const deleteImageCourse = async (req, res) => {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "src/infraestructure/storage/local/images/cursos");
+    cb(null, "src/infraestructure/storage/local/cursos");
   },
 
   filename: async (req, file, cb) => {

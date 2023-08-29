@@ -53,19 +53,21 @@ class usersService {
     }
   }
 
-  async addUpdateImageUser(id, newImage) {
+  async addUpdateImageUser(id, newImage, idUser, userRol) {
     try {
-      return await this.usersRepository.addUpdateImageUser(id, newImage);
+      return await this.usersRepository.addUpdateImageUser(id, newImage, idUser, userRol);
     } catch (error) {
-      throw new Error("(SERVICE - addUpdateImageUser) Error al actualizar la imagen del usuario: " + error.message);
+      console.error("(SERVICE - addUpdateImageUser) Error al actualizar la imagen del usuario: " + error.message);
+      throw error;
     }
   }
 
-  async deleteImageUser(id) {
+  async deleteImageUser(id, idUser, userRol) {
     try {
-      return await this.usersRepository.deleteImageUser(id);
+      return await this.usersRepository.deleteImageUser(id, idUser, userRol);
     } catch (error) {
-      throw new Error("(SERVICE - deleteImageUser) Error al eliminar la imagen del usuario: " + error.message);
+      console.error("(SERVICE - deleteImageUser) Error al eliminar la imagen del usuario: " + error.message);
+      throw error;
     }
   }
 
