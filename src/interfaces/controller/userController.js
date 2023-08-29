@@ -33,12 +33,28 @@ const authenticateUser = async (req, res) => {
 
 const getAllUsersAdmin = async (req, res) => {
   try {
+    const { ...dataFilter } = req.body;
+    const users = await usersService.getAllUsersAdmin(dataFilter);
+    
+    if (!users || users.length <= 0) {
+      res.status(404).json({ error: "No se encontraron usuarios" });
+    } else {
+      res.json(users);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error en el servidor al obtener los usuarios (controller - getAllUsersAdmin)" });
+  }
+};
+
+const getAllUsersAdminPaginated = async (req, res) => {
+  try {
     const { page, pageSize, ...dataFilter } = req.body;
 
     const pageNumber = parseInt(page) || 1;
     const limit = parseInt(pageSize) || 9;
 
-    const users = await usersService.getAllUsersAdmin(dataFilter, pageNumber, limit);
+    const users = await usersService.getAllUsersAdminPaginated(dataFilter, pageNumber, limit);
     
     if (!users || users.usersData.length <= 0) {
       res.status(404).json({ error: "No se encontraron usuarios" });
@@ -47,7 +63,7 @@ const getAllUsersAdmin = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error en el servidor al obtener los usuarios (controller - getAllUsersAdmin)" });
+    res.status(500).json({ error: "Error en el servidor al obtener los usuarios (controller - getAllUsersAdminPaginated)" });
   }
 };
 
@@ -212,6 +228,7 @@ const uploadImage = multer({
 export {
   authenticateUser,
   getAllUsersAdmin,
+  getAllUsersAdminPaginated,
   getUserDetail,
   createUser,
   getProfile,

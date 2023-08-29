@@ -4,6 +4,7 @@ import checkRole from '../middleware/roleMiddleware.js';
 import {
   authenticateUser,
   getAllUsersAdmin,
+  getAllUsersAdminPaginated,
   getUserDetail,
   createUser,
   getProfile,
@@ -19,6 +20,7 @@ const router = express.Router();
 router.get("/profile", checkAuth, getProfile);
 router.get("/detail/:id", checkAuth, getUserDetail);
 router.get('/admin/list', checkAuth, checkRole([1]), getAllUsersAdmin);
+router.get('/admin/list-paginate', checkAuth, checkRole([1]), getAllUsersAdminPaginated);
 
 router.post('/login', authenticateUser);
 router.post('/admin/create', checkAuth, checkRole([1]), createUser);

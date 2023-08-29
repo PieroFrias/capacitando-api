@@ -11,11 +11,19 @@ class usersService {
     }
   }
 
-  async getAllUsersAdmin(dataFilter, page, pageSize) {
+  async getAllUsersAdmin(dataFilter) {
     try {
-      return await this.usersRepository.getAllUsersAdmin(dataFilter, page, pageSize);
+      return await this.usersRepository.getAllUsersAdmin(dataFilter);
     } catch (error) {
       throw new Error("(SERVICE - getAllUsersAdmin) Error al obtener los usuarios: " + error.message);
+    }
+  }
+
+  async getAllUsersAdminPaginated(dataFilter, page, pageSize) {
+    try {
+      return await this.usersRepository.getAllUsersAdminPaginated(dataFilter, page, pageSize);
+    } catch (error) {
+      throw new Error("(SERVICE - getAllUsersAdminPaginated) Error al obtener los usuarios: " + error.message);
     }
   }
 
