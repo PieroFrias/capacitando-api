@@ -11,60 +11,42 @@ class categoriesRepository {
         this.connection = connection;
     }
 
-    // async getAllCategories(dataFilter, page, pageSize, rol) {
-    //     try {
-    //         const offset = (page - 1) * pageSize;
-    //         const { search, categoryId } = dataFilter;
+    async getAllCategories(dataFilter) {
+        try {
+            const { search } = dataFilter;
 
-    //         let categoryFilter = categoryId ? { idcategoria: categoryId } : {};
+            let whereCondition = {};
 
-    //         let filterConditions = [getWhereConditionByRol(rol)];
+            whereCondition = {
+                estado: 1,
+            };
 
-    //         if (search) {
-    //             filterConditions.push({
-    //                 [Op.or]: [
-    //                     { titulo: { [Op.like]: `%${search}%` } },
-    //                     { descripcion: { [Op.like]: `%${search}%` } },
-    //                 ],
-    //             });
-    //         };
+            if (search) {
+                whereCondition.categoria = {
+                    [Op.like]: `%${search}%`,
+                };
+            }
 
-    //         const whereCondition = { [Op.and]: filterConditions, };
+            const categories = await Category.findAll({
+                where: whereCondition,
+                order: [["idcategoria", "ASC"]],
+            });
 
-    //         const courses = await Category.findAndCountAll({
-    //             where: whereCondition,
-    //             include: [{
-    //                 model: Category,
-    //                 where: categoryFilter,
-    //             }],
-    //             order: [["updated_at", "DESC"]],
-    //             offset,
-    //             limit: pageSize,
-    //             distinct: true,
-    //         })
+            if (categories.length <= 0) { return false; }
 
-    //         if (courses.count <= 0) { return false; }
+            const categoriesData = categories.map((category) => ({
+                idcategoria: parseInt(category.idcategoria),
+                categoria: category.categoria,
+                estado: category.estado,
+            }));
 
-    //         const categoriesData = courses.rows.map((categorie) => ({
-    //             idcategoria: parseInt(categorie.idcategoria),
-    //             categoria: categorie.categoria,
-    //             estado: categorie.estado,
-    //         }));
+            return categoriesData;
 
-    //         const totalItems = categories.count;
-    //         const totalPages = Math.ceil(totalItems / pageSize);
+        } catch (error) {
+            throw error;
+        }
+    }
 
-    //         return {
-    //             categoriesData,
-    //             currentPage: page,
-    //             totalPages,
-    //             totalItems,
-    //         };
-
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
 
     async getCategoryDetail(id) {
         try {
@@ -86,67 +68,65 @@ class categoriesRepository {
         }
     }
 
-    // async createCategory(dataCategory) {
-    //     try {
-    //         const { categoria } = dataCategory;
-    //         const categoryExist = await Category.findOne({
-    //             where: { categoria: categoria, estado: 1 },
-    //         });
+    async createCategory(dataCategory) {
+        try {
+            const { categoria } = dataCategory;
+            const categoryExist = await Category.findOne({
+                where: { categoria: categoria, estado: 1 },
+            });
 
-    //         if (categoryExist) { return false; }
+            if (categoryExist) { return false; }
 
-    //         const category = await Category.create(dataCategory);
-    //         return category;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+            const category = await Category.create(dataCategory);
+            return category;
+        } catch (error) {
+            throw error;
+        }
+    }
 
-    // async updateCategory(idcategoria, dataCategorie) {
-    //     try {
-    //         const categorie = await Category.findOne({
-    //             where: { idcategoria, estado: 1 },
-    //         });
+    async updateCategory(idcategoria, dataCategorie) {
+        try {
+            const categorie = await Category.findOne({
+                where: { idcategoria, estado: 1 },
+            });
 
-    //         const {
-    //             categoria,
-    //         } = dataCategorie;
+            const {
+                categoria,
+            } = dataCategorie;
 
-    //         const categorieTitle = categoria ? await Category.findOne({ where: { categoria, estado: 1 } }) : null;
+            const categorieTitle = categoria ? await Category.findOne({ where: { categoria, estado: 1 } }) : null;
 
-    //         if (!categorie || (categorieTitle && categorieTitle.categoria !== categorie.categoria)) {
-    //             return false;
-    //         }
+            if (!categorie || (categorieTitle && categorieTitle.categoria !== categorie.categoria)) {
+                return false;
+            }
 
-    //         if (categoria && categoria !== categorie.categoria) {
-    //             categorie.categoria = categoria;
-    //         }
+            if (categoria && categoria !== categorie.categoria) {
+                categorie.categoria = categoria;
+            }
 
-    //         categorie.idcategoria = idcategoria;
+            await categorie.save();
+            return categorie;
+        } catch (error) {
+            throw error;
+        }
+    }
 
-    //         await categorie.save();
-    //         return categorie;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+    async changeStatusCategory(idcategoria) {
+        try {
+            const categorie = await Category.findOne({
+                where: { idcategoria, estado: 1 },
+            });
 
-    // async changeStatusCategorie(idcategoria) {
-    //     try {
-    //         const categorie = await Category.findOne({
-    //             where: { idcategoria, estado: 1 },
-    //         });
+            if (!categorie) { return false; }
 
-    //         if (!categorie) { return false; }
+            categorie.estado = 0;
 
-    //         categorie.estado = 0;
-
-    //         await categorie.save();
-    //         return categorie;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+            await categorie.save();
+            return categorie;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default categoriesRepository;
