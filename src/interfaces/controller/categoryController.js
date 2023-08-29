@@ -54,9 +54,9 @@ const createCategory = async (req, res) => {
     const newCategory = await categoriesService.createCategory(dataCategory);
 
     if (!newCategory) {
-      res.status(400).json({ error: "La categoria ya está registrado" });
+      res.status(400).json({ error: "La categoria ya existe" });
     } else {
-      res.json({ message: "Categoria registrado exitosamente" });
+      res.json({ message: "Categoria registrada exitosamente" });
     }
   } catch (error) {
     console.error(error);
@@ -78,7 +78,7 @@ const updateCategory = async (req, res) => {
     );
 
     if (updatedCategory) {
-      res.json({ message: "Categoria actualizado exitosamente" });
+      res.json({ message: "Categoria actualizada exitosamente" });
     } else {
       res
         .status(400)

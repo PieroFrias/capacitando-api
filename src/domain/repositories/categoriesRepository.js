@@ -22,7 +22,7 @@ class categorysRepository {
 
       const categorys = await Category.findAll({
         where: whereCondition,
-        order: [["idcategoria", "ASC"]],
+        order: [["idcategoria", "DESC"]],
       });
 
       if (categorys.length <= 0) { return false; }
