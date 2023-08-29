@@ -24,7 +24,50 @@ class usersRepository {
     }
   }
 
-  async getAllUsersAdmin(dataFilter, page, pageSize) {
+  async getAllUsersAdmin(dataFilter) {
+    try {
+      const { search, rol } = dataFilter;
+      const rolFilter = rol ? { rol: rol } : {}; 
+
+      let whereCondition = {};
+      whereCondition = {
+        rol: {
+          [Op.not]: 1,
+        },
+        ...rolFilter,
+      };
+      
+      if (search) {
+        whereCondition[Op.or] = [
+          { usuario: { [Op.like]: `%${search}%` } },
+          { apellido: { [Op.like]: `%${search}%` } },
+          { correo: { [Op.like]: `%${search}%` } },
+        ];
+      }
+
+      const users = await User.findAll({
+        where: whereCondition,
+        attributes: { exclude: ["password"] },
+        order: [["apellido", "ASC"]],
+        distinct: true,
+      });
+
+      if (users.length <= 0) { return false; }
+
+      const usersData = users.map((user) => {
+        return {
+          ...user.get(),
+          foto: user.foto ? `${process.env.DOMAIN}/${process.env.DATA}/usuarios/${author.foto}` : null,
+        };
+      });
+
+      return usersData;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllUsersAdminPaginated(dataFilter, page, pageSize) {
     try {
       const offset = (page - 1) * pageSize;
 
