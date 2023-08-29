@@ -3,12 +3,21 @@ class coursesService {
     this.coursesRepository = coursesRepository;
   }
 
-  async getAllCourses(dataFilter, page, pageSize, rol, userId) {
+  async getAllCourses(dataFilter, rol, userId) {
     try {
-      const courses = await this.coursesRepository.getAllCourses(dataFilter, page, pageSize, rol, userId);
+      const courses = await this.coursesRepository.getAllCourses(dataFilter, rol, userId);
       return courses;
     } catch (error) {
-      throw new Error("(SERVICE - getAllCoursesAdmin) Error al obtener los cursos: " + error.message);
+      throw new Error("(SERVICE - getAllCourses) Error al obtener los cursos: " + error.message);
+    }
+  }
+
+  async getAllCoursesPaginated(dataFilter, page, pageSize, rol, userId) {
+    try {
+      const courses = await this.coursesRepository.getAllCoursesPaginated(dataFilter, page, pageSize, rol, userId);
+      return courses;
+    } catch (error) {
+      throw new Error("(SERVICE - getAllCoursesPaginated) Error al obtener los cursos: " + error.message);
     }
   }
 
