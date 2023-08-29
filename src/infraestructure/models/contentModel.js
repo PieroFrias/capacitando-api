@@ -21,8 +21,8 @@ const Content = connection.define('contenido', {
     type: Sequelize.INTEGER,
     allowNull: false,
     references:{
-        model: Session,
-        key: 'idsesion'
+      model: Session,
+      key: 'idsesion'
     }
   },
   url_video: {
@@ -31,7 +31,7 @@ const Content = connection.define('contenido', {
   },
   minutos_video: {
     type: Sequelize.INTEGER,
-    allowNull: true,
+    allowNull: false,
   },
   estado: {
     type: Sequelize.INTEGER,
