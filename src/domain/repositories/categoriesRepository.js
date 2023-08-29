@@ -1,132 +1,109 @@
 import { Op } from "sequelize";
-// import Course from "../../infraestructure/models/courseModel.js";
 import Category from "../../infraestructure/models/categoryModel.js";
-// import Session from "../../infraestructure/models/sessionModel.js";
-// import Content from "../../infraestructure/models/contentModel.js";
-// import CourseUser from "../../infraestructure/models/courseUserModel.js";
-// import User from "../../infraestructure/models/userModel.js";
 
-class categoriesRepository {
-    constructor(connection) {
-        this.connection = connection;
+class categorysRepository {
+  constructor(connection) {
+    this.connection = connection;
+  }
+
+  async getAllCategories(dataFilter) {
+    try {
+      const { search } = dataFilter;
+
+      let whereCondition = {};
+
+      whereCondition = { estado: 1 };
+
+      if (search) {
+        whereCondition.categoria = {
+          [Op.like]: `%${search}%`,
+        };
+      }
+
+      const categorys = await Category.findAll({
+        where: whereCondition,
+        order: [["idcategoria", "ASC"]],
+      });
+
+      if (categorys.length <= 0) { return false; }
+
+      return categorys;
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async getAllCategories(dataFilter) {
-        try {
-            const { search } = dataFilter;
+  async getCategoryDetail(id) {
+    try {
+      const category = await Category.findOne({
+        where: { estado: 1, idcategoria: id },
+      });
 
-            let whereCondition = {};
+      if (!category) { return false; }
 
-            whereCondition = {
-                estado: 1,
-            };
-
-            if (search) {
-                whereCondition.categoria = {
-                    [Op.like]: `%${search}%`,
-                };
-            }
-
-            const categories = await Category.findAll({
-                where: whereCondition,
-                order: [["idcategoria", "ASC"]],
-            });
-
-            if (categories.length <= 0) { return false; }
-
-            const categoriesData = categories.map((category) => ({
-                idcategoria: parseInt(category.idcategoria),
-                categoria: category.categoria,
-                estado: category.estado,
-            }));
-
-            return categoriesData;
-
-        } catch (error) {
-            throw error;
-        }
+      return category;
+    } catch (error) {
+      throw error;
     }
+  }
 
+  async createCategory(dataCategory) {
+    try {
+      const { categoria } = dataCategory;
+      const categoryExist = await Category.findOne({
+        where: { categoria: categoria, estado: 1 },
+      });
 
-    async getCategoryDetail(id) {
-        try {
-            const category = await Category.findOne({
-                where: { estado: 1, idcategoria: id },
-            });
+      if (categoryExist) { return false; }
 
-            if (!category) { return false; }
-
-            const categoryData = {
-                idcategoria: parseInt(category.idcategoria),
-                categoria: category.categoria,
-                estado: category.estado,
-            };
-
-            return categoryData;
-        } catch (error) {
-            throw error;
-        }
+      const category = await Category.create(dataCategory);
+      return category;
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async createCategory(dataCategory) {
-        try {
-            const { categoria } = dataCategory;
-            const categoryExist = await Category.findOne({
-                where: { categoria: categoria, estado: 1 },
-            });
+  async updateCategory(idcategoria, dataCategory) {
+    try {
+      const category = await Category.findOne({
+        where: { idcategoria, estado: 1 },
+      });
 
-            if (categoryExist) { return false; }
+      const { categoria } = dataCategory;
 
-            const category = await Category.create(dataCategory);
-            return category;
-        } catch (error) {
-            throw error;
-        }
+      const categoryTitle = categoria ? await Category.findOne({ where: { categoria, estado: 1 } }) : null;
+
+      if (!category || (categoryTitle && categoryTitle.categoria !== category.categoria)) {
+        return false;
+      }
+
+      if (categoria && categoria !== category.categoria) {
+        category.categoria = categoria;
+      }
+
+      await category.save();
+      return category;
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async updateCategory(idcategoria, dataCategorie) {
-        try {
-            const categorie = await Category.findOne({
-                where: { idcategoria, estado: 1 },
-            });
+  async changeStatusCategory(idcategoria) {
+    try {
+      const category = await Category.findOne({
+        where: { idcategoria, estado: 1 },
+      });
 
-            const {
-                categoria,
-            } = dataCategorie;
+      if (!category) { return false; }
 
-            const categorieTitle = categoria ? await Category.findOne({ where: { categoria, estado: 1 } }) : null;
+      category.estado = 0;
 
-            if (!categorie || (categorieTitle && categorieTitle.categoria !== categorie.categoria)) {
-                return false;
-            }
-
-            if (categoria && categoria !== categorie.categoria) {
-                categorie.categoria = categoria;
-            }
-
-            await categorie.save();
-            return categorie;
-        } catch (error) {
-            throw error;
-        }
+      await category.save();
+      return category;
+    } catch (error) {
+      throw error;
     }
-
-    async changeStatusCategory(idcategoria) {
-        try {
-            const categorie = await Category.findOne({
-                where: { idcategoria, estado: 1 },
-            });
-
-            if (!categorie) { return false; }
-
-            categorie.estado = 0;
-
-            await categorie.save();
-            return categorie;
-        } catch (error) {
-            throw error;
-        }
-    }
+  }
 }
 
-export default categoriesRepository;
+export default categorysRepository;
