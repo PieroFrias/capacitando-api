@@ -3,6 +3,7 @@ import checkAuth from '../middleware/authMiddleware.js';
 import checkRole from '../middleware/roleMiddleware.js';
 import {
   getAllCourses,
+  getAllCoursesPaginated,
   getCourseDetail,
   createCourse,
   addCourseUser,
@@ -19,6 +20,7 @@ const router = express.Router();
 router.get("/detail/:id", checkAuth, getCourseDetail);
 
 router.post("/list", checkAuth, getAllCourses);
+router.post("/list-paginate", checkAuth, getAllCoursesPaginated);
 router.post("/create", checkAuth, checkRole([1]), createCourse);
 router.post("/add/user", checkAuth, checkRole([1]), addCourseUser);
 
