@@ -11,10 +11,19 @@ const Resource = connection.define('recurso', {
   nombre: {
     type: Sequelize.STRING(200),
     allowNull: false,
+    unique: true,
+  },
+  tipo_recurso: {
+    type: Sequelize.STRING(45),
+    allowNull: true,
   },
   url: {
     type: Sequelize.STRING(200),
-    allowNull: false,
+    allowNull: true,
+  },
+  archivo: {
+    type: Sequelize.STRING(200),
+    allowNull: true,
   },
   idcontenido: {
     type: Sequelize.INTEGER,

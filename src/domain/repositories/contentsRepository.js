@@ -41,9 +41,9 @@ class contentsRepository {
         .map((resource) => ({
           idrecurso: parseInt(resource.idrecurso),
           nombre: resource.nombre,
-          tipo_recurso: resource.tipo_recurso,
+          //tipo_recurso: resource.tipo_recurso,
           url: resource.url ? resource.url : null,
-          archivo: resource.archivo ? resource.archivo : null,
+          //archivo: resource.archivo ? resource.archivo : null,
           estado: resource.estado,
         })),
 
@@ -79,9 +79,9 @@ class contentsRepository {
         .map((resource) => ({
           idrecurso: parseInt(resource.idrecurso),
           nombre: resource.nombre,
-          tipo_recurso: resource.tipo_recurso,
+          //tipo_recurso: resource.tipo_recurso,
           url: resource.url ? resource.url : null,
-          archivo: resource.archivo ? resource.archivo : null,
+          //archivo: resource.archivo ? resource.archivo : null,
           estado: resource.estado,
         })),
 
