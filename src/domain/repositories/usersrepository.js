@@ -57,7 +57,7 @@ class usersRepository {
       const usersData = users.map((user) => {
         return {
           ...user.get(),
-          foto: user.foto ? `${process.env.DOMAIN}/${process.env.DATA}/usuarios/${author.foto}` : null,
+          foto: user.foto ? `${process.env.DOMAIN}/${process.env.DATA}/usuarios/${user.foto}` : null,
         };
       });
 
@@ -104,7 +104,7 @@ class usersRepository {
       const usersData = users.rows.map((user) => {
         return {
           ...user.get(),
-          foto: user.foto ? `${process.env.DOMAIN}/${process.env.DATA}/usuarios/${author.foto}` : null,
+          foto: user.foto ? `${process.env.DOMAIN}/${process.env.DATA}/usuarios/${user.foto}` : null,
         };
       });
 
@@ -224,13 +224,17 @@ class usersRepository {
     }
   }
 
-  async addUpdateImageUser(idusuario, newImage) {
+  async addUpdateImageUser(idusuario, newImage, idUser, userRol) {
     try {
       if (!newImage) { return false; }
 
       const user = await User.findOne({
         where: { idusuario, estado: 1 },
       });
+
+      if (userRol !== 1 && idUser !== user.idusuario) {
+        throw new Error('No tienes permisos para editar este perfil');
+      }
 
       user.foto = newImage;
 
@@ -241,18 +245,22 @@ class usersRepository {
     }
   }
 
-  async deleteImageUser(idusuario) {
+  async deleteImageUser(idusuario, idUser, userRol) {
     try {
       const user = await User.findOne({
         where: { idusuario, estado: 1, },
       });
 
-      if (!user) { return false; }
+      if (!user) { throw new Error('Usuario no encontrado'); }
+
+      if (userRol !== 1 && idUser !== user.idusuario) {
+        throw new Error('No tienes permisos para editar este perfil');
+      }
 
       const img = user.foto;
-
-      user.foto = null;
+      user.foto = null;      
       await user.save();
+
       return img;
     } catch (error) {
       throw error;
