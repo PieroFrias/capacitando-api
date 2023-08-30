@@ -1,6 +1,7 @@
 import express from 'express';
 import checkAuth from '../middleware/authMiddleware.js';
 import checkRole from '../middleware/roleMiddleware.js';
+import { validateCreate, validateEdit } from '../middleware/validators/userValidator.js';
 import {
   authenticateUser,
   getAllUsersAdmin,
@@ -25,13 +26,12 @@ router.get("/detail/:id", checkAuth, getUserDetail);
 router.get('/reset/password/:id', checkAuth, checkRole([1]), resetPasswordUser);
 
 router.post('/login', authenticateUser);
-router.post('/admin/create', checkAuth, checkRole([1]), createUser);
+router.post('/admin/create', checkAuth, checkRole([1]), validateCreate, createUser);
 
 router.put("/image/:id", checkAuth, uploadImage.single("foto"), addUpdateImageUser);
 router.put('/status/:id', checkAuth, checkRole([1]), changeStatusUser);
 
-router.patch('/update/:id', checkAuth, updateUser);
-
+router.patch('/update/:id', checkAuth, validateEdit, updateUser);
 
 router.delete("/delete/image/:id", checkAuth, deleteImageUser);
 
