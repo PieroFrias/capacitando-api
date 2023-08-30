@@ -368,7 +368,6 @@ class coursesRepository {
       if (titulo && titulo !== course.titulo) {
         const newCourseTitle = titulo.toLowerCase().replace(/\s/g, "_");
         const oldCourseTitle = course.titulo.toLowerCase().replace(/\s/g, "_");
-
         const imgExtension = path.extname(course.url_portada);
 
         const oldImagePath = `src/infraestructure/storage/local/cursos/${oldCourseTitle}${imgExtension}`;
