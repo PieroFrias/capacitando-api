@@ -12,9 +12,9 @@ import {
 
 const router = express.Router();
 
+router.get("/list", checkAuth, getAllCategories);
 router.get("/detail/:id", checkAuth, getCategoryDetail);
 
-router.post("/list", checkAuth, getAllCategories);
 router.post("/create", checkAuth, checkRole([1]), validateCreate, createCategory);
 
 router.patch("/update/:id", checkAuth, checkRole([1]), validateEdit, updateCategory);
