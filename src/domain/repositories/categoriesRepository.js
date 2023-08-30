@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import Category from "../../infraestructure/models/categoryModel.js";
+import Course from "../../infraestructure/models/courseModel.js";
 
 class categorysRepository {
   constructor(connection) {
@@ -92,13 +93,20 @@ class categorysRepository {
     try {
       const category = await Category.findOne({
         where: { idcategoria, estado: 1 },
+        include: [
+          {
+            model: Course,
+            where: { estado: 1 },
+          }
+        ]
       });
 
-      if (!category) { return false; }
+      if (category && category.cursos.length > 0) { return false; }
 
-      category.estado = 0;
+      const deleteCategory = await Category.findByPk(idcategoria);
+      deleteCategory.estado = 0;
 
-      await category.save();
+      await deleteCategory.save();
       return category;
     } catch (error) {
       throw error;

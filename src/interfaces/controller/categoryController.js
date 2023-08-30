@@ -18,12 +18,7 @@ const getAllCategories = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        error:
-          "Ocurrió un error en el servidor (controller - getAllCategories)",
-      });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - getAllCategories)" });
   }
 };
 
@@ -39,12 +34,7 @@ const getCategoryDetail = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        error:
-          "Ocurrió un error en el servidor (controller - getCategoryDetail)",
-      });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - getCategoryDetail)" });
   }
 };
 
@@ -60,11 +50,7 @@ const createCategory = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        error: "Ocurrió un error en el servidor (controller - createCategory)",
-      });
+    res.status(500).json({ error: "Ocurrió un error en el servidor (controller - createCategory)" });
   }
 };
 
@@ -80,11 +66,7 @@ const updateCategory = async (req, res) => {
     if (updatedCategory) {
       res.json({ message: "Categoria actualizada exitosamente" });
     } else {
-      res
-        .status(400)
-        .json({
-          error: "Categoria no encontrada o nombre de Categoria repetida",
-        });
+      res.status(400).json({ error: "Categoria no encontrada o nombre de Categoria repetida" });
     }
   } catch (error) {
     console.error(error);
@@ -102,18 +84,13 @@ const changeStatusCategory = async (req, res) => {
     const category = await categoriesService.changeStatusCategory(id);
 
     if (category) {
-      res.json({ message: "Categoria actualizado exitosamente" });
+      res.json({ message: "Categoria deshabilitada exitosamente" });
     } else {
-      res.status(400).json({ error: "Categoria no encontrada" });
+      res.status(400).json({ error: "No se pudo eliminar la categoría. Por favor, asegúrate de que exista y que no se encuentre relacionada con algún curso" });
     }
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        error:
-          "Ocurrió un error en servidor (controller - changeStatusCategory)",
-      });
+    res.status(500).json({ error: "Ocurrió un error en servidor (controller - changeStatusCategory)" });
   }
 };
 
