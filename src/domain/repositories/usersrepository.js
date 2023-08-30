@@ -48,7 +48,7 @@ class usersRepository {
       const users = await User.findAll({
         where: whereCondition,
         attributes: { exclude: ["password"] },
-        order: [["apellido", "ASC"]],
+        order: [["idusuario", "DESC"]],
         distinct: true,
       });
 
@@ -93,7 +93,7 @@ class usersRepository {
       const users = await User.findAndCountAll({
         where: whereCondition,
         attributes: { exclude: ["password"] },
-        order: [["apellido", "ASC"]],
+        order: [["idusuaio", "DESC"]],
         offset,
         limit: pageSize,
         distinct: true,
