@@ -1,4 +1,6 @@
 import { Op } from "sequelize";
+import path from "path";
+import fs from "fs";
 import Course from "../../infraestructure/models/courseModel.js";
 import Category from "../../infraestructure/models/categoryModel.js";
 import Session from "../../infraestructure/models/sessionModel.js";
@@ -364,7 +366,16 @@ class coursesRepository {
       }
 
       if (titulo && titulo !== course.titulo) {
+        const newCourseTitle = titulo.toLowerCase().replace(/\s/g, "_");
+        const oldCourseTitle = course.titulo.toLowerCase().replace(/\s/g, "_");
+        const imgExtension = path.extname(course.url_portada);
+
+        const oldImagePath = `src/infraestructure/storage/local/cursos/${oldCourseTitle}${imgExtension}`;
+        const newImagePath = `src/infraestructure/storage/local/cursos/${newCourseTitle}${imgExtension}`;
+        fs.renameSync(oldImagePath, newImagePath);
+
         course.titulo = titulo;
+        course.url_portada = `${newCourseTitle}${imgExtension}`;
       }
       course.url_video_intro = url_video_intro;
       course.descripcion = descripcion;
@@ -384,6 +395,14 @@ class coursesRepository {
       const course = await Course.findOne({
         where: { idcurso, estado: 1 },
       });
+
+      const oldImageExtension = path.extname(course.url_portada);
+      const newImageExtension = path.extname(newImage);
+
+      if (newImageExtension !== oldImageExtension) {
+        const oldImagePath = `src/infraestructure/storage/local/cursos/${course.url_portada}`;
+        fs.unlinkSync(oldImagePath);
+      }
 
       course.url_portada = newImage;
 
