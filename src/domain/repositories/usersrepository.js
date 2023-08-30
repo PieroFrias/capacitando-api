@@ -198,7 +198,12 @@ class usersRepository {
         throw new Error('No tienes permisos para editar este perfil');
       }
 
-      const comprobarPass = await user.comprobarPassword(currentPassword);
+      let comprobarPass = 1;
+      if ((currentPassword && currentPassword !== "") && (newPassword && newPassword !== "")) {
+        comprobarPass = await user.comprobarPassword(currentPassword);
+      } else {
+        comprobarPass = 1;
+      }
 
       if (!comprobarPass) { return false; }
 
@@ -207,7 +212,9 @@ class usersRepository {
         user.correo = correo;
       }
 
-      user.password = newPassword;
+      if (comprobarPass !== 1) {
+        user.password = newPassword; 
+      }
       user.nombre = nombre || user.nombre;
       user.apellido = apellido || user.apellido;
       user.telefono = telefono || user.telefono;
@@ -276,6 +283,23 @@ class usersRepository {
       if (!user) { return false; }
 
       user.estado = 0;
+
+      await user.save();
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async resetPasswordUser(idusuario) {
+    try {
+      const user = await User.findOne({
+        where: { idusuario, estado: 1 }
+      });
+
+      if (!user) { return false; }
+
+      user.password = "123456789";
 
       await user.save();
       return true;

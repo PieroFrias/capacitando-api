@@ -191,6 +191,22 @@ const deleteImageUser = async (req, res) => {
   }
 };
 
+const resetPasswordUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await usersService.resetPasswordUser(id);
+
+    if (user) {
+      res.json({ message: "Contraseña restablecida exitosamente" });
+    } else {
+      res.status(404).json({ error: "Usuario no encontrado" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error en el servidor al restablecer la contraseña del usuario (controller - resetPasswordUser)" });
+  }
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "src/infraestructure/storage/local/usuarios");
@@ -243,4 +259,5 @@ export {
   deleteImageUser,
   uploadImage,
   changeStatusUser,
+  resetPasswordUser,
 };

@@ -13,14 +13,16 @@ import {
   deleteImageUser,
   uploadImage,
   changeStatusUser,
+  resetPasswordUser,
 } from '../controller/userController.js';
 
 const router = express.Router();
 
 router.get("/profile", checkAuth, getProfile);
-router.get("/detail/:id", checkAuth, getUserDetail);
 router.get('/admin/list', checkAuth, checkRole([1]), getAllUsersAdmin);
 router.get('/admin/list-paginate', checkAuth, checkRole([1]), getAllUsersAdminPaginated);
+router.get("/detail/:id", checkAuth, getUserDetail);
+router.get('/reset/password/:id', checkAuth, checkRole([1]), resetPasswordUser);
 
 router.post('/login', authenticateUser);
 router.post('/admin/create', checkAuth, checkRole([1]), createUser);
