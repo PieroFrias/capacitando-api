@@ -125,7 +125,7 @@ const updateUser = async (req, res) => {
     const updatedUser = await usersService.updateUser(id, dataUser, idUser, userRol);
 
     if (updatedUser) {
-      res.json({ message: "Usuario actualizado correctamente" });
+      res.json({ message: "Usuario actualizado exitosamente" });
     } else {
       res.status(400).json({ error: "No se pudo actualizar, por favor revise sus datos e intente nuevamente." });
     }
@@ -141,7 +141,7 @@ const changeStatusUser = async (req, res) => {
     const user = await usersService.changeStatusUser(id);
 
     if (user) {
-      res.json({ message: "Usuario deshabilitado correctamente" });
+      res.json({ message: "Estado cambiado exitosamente" });
     } else {
       res.status(404).json({ error: "Usuario no encontrado" });
     }
@@ -181,7 +181,7 @@ const deleteImageUser = async (req, res) => {
       const imgRoute = `src/infraestructure/storage/local/usuarios/${img}`;
       deleteImage(imgRoute);
 
-      res.json({ message: "Imagen eliminada correctamente" });
+      res.json({ message: "Imagen eliminada exitosamente" });
     } else {
       res.status(404).json({ error: "Imagen asociada no encontrada" });
     }
