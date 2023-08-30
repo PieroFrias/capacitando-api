@@ -276,13 +276,15 @@ class usersRepository {
 
   async changeStatusUser(idusuario) {
     try {
-      const user = await User.findOne({
-        where: { idusuario, estado: 1 }
-      });
+      const user = await User.findOne({ where: { idusuario } });
 
       if (!user) { return false; }
 
-      user.estado = 0;
+      if (user.estado == 0) {
+        user.estado = 1;
+      } else {
+        user.estado = 0;
+      }
 
       await user.save();
       return true;
