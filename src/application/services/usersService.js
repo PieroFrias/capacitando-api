@@ -78,6 +78,14 @@ class usersService {
       throw new Error("(SERVICE - changeStatusUser) Error al cambiar el estado del usuario: " + error.message);
     }
   }
+
+  async resetPasswordUser(id) {
+    try {
+      return await this.usersRepository.resetPasswordUser(id);
+    } catch (error) {
+      throw new Error("(SERVICE - resetPasswordUser) Error al resetear la contraseña del usuario: " + error.message);
+    }
+  }
 }
 
 export default usersService;
