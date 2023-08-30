@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
+router.get("/list/:id", checkAuth, getAllSessions);
 router.get("/detail/:id", checkAuth, getSessionDetail);
 
 router.post("/create", checkAuth, checkRole([2]), createSession);
-router.post("/list/:id", checkAuth, getAllSessions);
 
 router.patch("/update/:id", checkAuth, checkRole([2]), updateSession);
 
