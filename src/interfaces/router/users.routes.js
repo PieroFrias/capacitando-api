@@ -26,11 +26,12 @@ router.get('/reset/password/:id', checkAuth, checkRole([1]), resetPasswordUser);
 
 router.post('/login', authenticateUser);
 router.post('/admin/create', checkAuth, checkRole([1]), createUser);
+
 router.put("/image/:id", checkAuth, uploadImage.single("foto"), addUpdateImageUser);
+router.put('/status/:id', checkAuth, checkRole([1]), changeStatusUser);
 
 router.patch('/update/:id', checkAuth, updateUser);
 
-router.put('/status/:id', checkAuth, checkRole([1]), changeStatusUser);
 
 router.delete("/delete/image/:id", checkAuth, deleteImageUser);
 

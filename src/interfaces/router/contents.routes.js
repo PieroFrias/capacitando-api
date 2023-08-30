@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
+router.get("/list/:id", checkAuth, getAllContents);
 router.get("/detail/:id", checkAuth, getContentDetail);
 
 router.post("/create", checkAuth, checkRole([2]), createContent);
-router.post("/list/:id", checkAuth, getAllContents);
 
 router.patch("/update/:id", checkAuth, checkRole([2]), updateContent);
 

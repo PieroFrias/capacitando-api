@@ -19,9 +19,9 @@ import {
 const router = express.Router();
 
 router.get("/detail/:id", checkAuth, getCourseDetail);
+router.get("/list", checkAuth, getAllCourses);
+router.get("/list-paginate", checkAuth, getAllCoursesPaginated);
 
-router.post("/list", checkAuth, getAllCourses);
-router.post("/list-paginate", checkAuth, getAllCoursesPaginated);
 router.post("/create", checkAuth, checkRole([1]), createCourse);
 router.post("/add/user", checkAuth, checkRole([1]), addCourseUser);
 
