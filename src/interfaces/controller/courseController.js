@@ -171,7 +171,7 @@ const deleteImageCourse = async (req, res) => {
     const img = await coursesService.deleteImageCourse(id);
 
     if (img) {
-      const imgRoute = `src/infraestructure/storage/local/images/cursos/${img}`;
+      const imgRoute = `src/infraestructure/storage/local/cursos/${img}`;
       deleteImage(imgRoute);
 
       res.json({ message: "Imagen eliminada correctamente" });
@@ -191,8 +191,10 @@ const storage = multer.diskStorage({
 
   filename: async (req, file, cb) => {
     try {
+      const rol = req.user ? req.user.rol : null;
+      const userId = req.user ? req.user.idusuario : null;
       const { id } = req.params;
-      const course = await coursesService.getCourseDetail(id);
+      const course = await coursesService.getCourseDetail(id, rol, userId);
       const courseName = course.titulo.toLowerCase().replace(/\s/g, "_");
       const extention = path.extname(file.originalname);
       const imgName = `${courseName}${extention}`;
