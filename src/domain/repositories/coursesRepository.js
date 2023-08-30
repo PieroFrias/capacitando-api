@@ -205,6 +205,7 @@ class coursesRepository {
       const isActiveSession = session => session.estado == 1;
       const isActiveContent = content => content.estado == 1;
       const isTeacher = instructor => instructor.user.rol == 2;
+      const isStudent = student => student.user.rol == 3;
 
       const courseData = {
         idcurso: parseInt(course.idcurso),
@@ -248,6 +249,21 @@ class coursesRepository {
             perfil: instructor.user.perfil,
             foto: instructor.user.foto
               ? `${process.env.DOMAIN}/${process.env.DATA}/usuarios/${instructor.user.foto}`
+              : null,
+          })),
+
+        estudiantes: course.curso_usuarios
+          .filter(isStudent)
+          .map((student) => ({
+            id_estudiante: parseInt(student.user.idusuario),
+            estudiante: `${student.user.nombre} ${student.user.apellido}`,
+            telefono: student.user.telefono,
+            dni: student.user.dni,
+            correo: student.user.correo,
+            direccion: student.user.direccion,
+            carrera: student.user.carrera,
+            foto: student.user.foto
+              ? `${process.env.DOMAIN}/${process.env.DATA}/usuarios/${student.user.foto}`
               : null,
           })),
 
