@@ -32,7 +32,10 @@ class sessionsRepository {
 
       const sessions = await Session.findAll({
         where: whereCondition,
-        include: [Course],
+        include: [{
+          model: Course,
+          where: { estado: 1 }
+        }],
         order: [["idsesion", "DESC"]],
         distinct: true,
       });
@@ -58,7 +61,13 @@ class sessionsRepository {
     try {
       const session = await Session.findOne({
         where: { estado: 1, idsesion, },
-        include: [Course, Content],
+        include: [
+          {
+            model: Course,
+            where: { estado: 1 },
+          },
+          { model: Content }
+        ],
       });
 
       if (!session) { return false; }
@@ -158,8 +167,9 @@ class sessionsRepository {
             model: Content,
             include: [{ model: Resource }]
           },
-          {
-            model: Course
+          { 
+            model: Course,
+            where:{ estado: 1 } 
           }
         ],
       });

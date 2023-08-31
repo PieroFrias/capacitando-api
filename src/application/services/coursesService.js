@@ -84,9 +84,9 @@ class coursesService {
     }
   }
 
-  async changeStatusCourse(id, estado) {
+  async changeStatusCourse(id) {
     try {
-      const course = await this.coursesRepository.changeStatusCourse(id, estado);
+      const course = await this.coursesRepository.changeStatusCourse(id);
       return course;
     } catch (error) {
       throw new Error("(SERVICE - changeStatusCourse) Error al cambiar el estado del curso: " + error.message);
