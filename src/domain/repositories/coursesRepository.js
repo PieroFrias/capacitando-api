@@ -431,7 +431,7 @@ class coursesRepository {
     }
   }
 
-  async changeStatusCourse(idcurso, estado) {
+  async changeStatusCourse(idcurso) {
     try {
       const course = await Course.findOne({
         where: { idcurso },
@@ -439,9 +439,14 @@ class coursesRepository {
 
       if (!course) { return false; }
 
-      course.estado = estado;
+      if (course.estado == 1) {
+        course.estado = 0;
+      }
+      else if (course.estado == 0) {
+        course.estado = 1;
+      }
+
       await course.save();
-      
       return course;
     } catch (error) {
       throw error;
