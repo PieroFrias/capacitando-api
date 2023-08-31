@@ -134,8 +134,7 @@ const updateCourse = async (req, res) => {
 const changeStatusCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    const { estado } = req.body;
-    const course = await coursesService.changeStatusCourse(id, estado);
+    const course = await coursesService.changeStatusCourse(id);
 
     if (course) {
       res.json({ message: "Estado del curso cambiado exitosamente" });
