@@ -174,20 +174,20 @@ class coursesRepository {
   async getCourseDetail(id, rol, userId) {
     try {
       let whereCondition = {};
-  
+
       if (rol == 1) {
         whereCondition = { idcurso: id };
       }
       else if (rol == 2 || rol == 3) {
         const userCourses = await CourseUser.findAll({
-          where: { idusuario: userId },
+          where: { idusuario: userId, idcurso: id },
         });
-  
-        const courseIds = userCourses.map((userCourse) => userCourse.idcurso);
-  
-        if (!courseIds.includes(id)) { return false; }
 
-        whereCondition = { estado: 1, idcurso: courseIds, };
+        const courseIds = userCourses.map((userCourse) => userCourse.idcurso);
+
+        if (!courseIds) { return false; }
+
+        whereCondition = { estado: 1, idcurso: courseIds };
       }
 
       const course = await Course.findOne({
