@@ -5,7 +5,6 @@ import Course from "../../infraestructure/models/courseModel.js";
 import Category from "../../infraestructure/models/categoryModel.js";
 import Session from "../../infraestructure/models/sessionModel.js";
 import Content from "../../infraestructure/models/contentModel.js";
-import Resource from "../../infraestructure/models/resourceModel.js";
 import CourseUser from "../../infraestructure/models/courseUserModel.js";
 import User from "../../infraestructure/models/userModel.js";
 
@@ -201,12 +200,7 @@ class coursesRepository {
           },
           { 
             model: Session, 
-            include: [
-              { 
-                model: Content,
-                include: [{ model: Resource }]
-              }
-            ] 
+            include: [{ model: Content }] 
           }
         ],
       });
@@ -215,7 +209,6 @@ class coursesRepository {
 
       const isActiveSession = session => session.estado == 1;
       const isActiveContent = content => content.estado == 1;
-      const isActiveResource = resource => resource.estado == 1;
       const isTeacher = instructor => instructor.user.rol == 2;
       const isStudent = student => student.user.rol == 3;
 
@@ -246,15 +239,6 @@ class coursesRepository {
                 descripcion_contenido: content.descripcion,
                 url_video: content.url_video,
                 minutos: content.minutos_video,
-
-                recursos: content.recursos
-                .filter(isActiveResource)
-                .map((resource) => ({
-                  idrecurso: parseInt(resource.idrecurso),
-                  nombre: resource.nombre,
-                  url: resource.url ? resource.url : null,
-                  estado: resource.estado,
-                })),
               })),
           })),
 
