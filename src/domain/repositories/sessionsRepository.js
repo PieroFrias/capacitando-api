@@ -114,7 +114,7 @@ class sessionsRepository {
       });
 
       const sessionExists = await Session.findOne({
-        where: { nombre_sesion, estado: 1 },
+        where: { nombre_sesion, idcurso, estado: 1 },
       });
 
       if (!isUserAssignedToCourse || sessionExists) { return false; }

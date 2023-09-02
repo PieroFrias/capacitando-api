@@ -41,8 +41,9 @@ const getContentDetail = async (req, res) => {
 
 const createContent = async (req, res) => {
   try {
+    const userId = req.user ? req.user.idusuario : null;
     const dataContent = req.body;
-    const content = await contentsService.createContent(dataContent);
+    const content = await contentsService.createContent(dataContent, userId);
     
     if (!content) {
       res.status(400).json({ error: "No se pudo registrar, verifica si el contenido ya existe." });
@@ -57,9 +58,10 @@ const createContent = async (req, res) => {
 
 const updateContent = async (req, res) => {
   try {
+    const userId = req.user ? req.user.idusuario : null;
     const { id } = req.params;
     const dataContent = req.body;
-    const content = await contentsService.updateContent(id, dataContent);
+    const content = await contentsService.updateContent(id, dataContent, userId);
     
     if (!content) {
       res.status(400).json({ error: "No se pudo actualizar, verifica si el contenido ya existe." });

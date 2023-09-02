@@ -21,18 +21,18 @@ class contentsService {
     }
   }
 
-  async createContent(dataContent) {
+  async createContent(dataContent, userId) {
     try {
-      const content = await this.contentsRepository.createContent(dataContent);
+      const content = await this.contentsRepository.createContent(dataContent, userId);
       return content;
     } catch (error) {
       throw new Error("(SERVICE - createContent) Error al crear el contenido: " + error.message);
     }
   }
 
-  async updateContent(idcontenido, dataContent) {
+  async updateContent(idcontenido, dataContent, userId) {
     try {
-      const content = await this.contentsRepository.updateContent(idcontenido, dataContent);
+      const content = await this.contentsRepository.updateContent(idcontenido, dataContent, userId);
       return content;
     } catch (error) {
       throw new Error("(SERVICE - updateContent) Error al actualizar el contenido: " + error.message);
