@@ -67,10 +67,10 @@ class resourcesRepository {
 
   async createResource(dataResource) {
     try {
-      const { nombre } = dataResource;
+      const { nombre, idcontenido } = dataResource;
 
       const resourceExists = await Resource.findOne({
-        where: { nombre, estado: 1 },
+        where: { nombre, idcontenido, estado: 1 },
       });
 
       if (resourceExists) { return false; }
