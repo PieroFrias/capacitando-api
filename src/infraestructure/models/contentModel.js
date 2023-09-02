@@ -40,8 +40,4 @@ const Content = connection.define('contenido', {
 
 Content.belongsTo(Session, { foreignKey: 'idsesion', targetKey: 'idsesion' });
 
-import('./resourceModel.js').then((Resource) => {
-  Content.hasMany(Resource.default, { foreignKey: 'idcontenido' });
-});
-
 export default Content;
