@@ -32,7 +32,6 @@ class contentsRepository {
       const contentsData = contents.map((content) => ({
         idcontenido: parseInt(content.idcontenido),
         titulo: content.titulo,
-        descripcion: content.descripcion,
         sesion: content.sesion.nombre_sesion,
         idsesion: parseInt(content.sesion.idsesion),
 
@@ -41,9 +40,7 @@ class contentsRepository {
         .map((resource) => ({
           idrecurso: parseInt(resource.idrecurso),
           nombre: resource.nombre,
-          //tipo_recurso: resource.tipo_recurso,
           url: resource.url ? resource.url : null,
-          //archivo: resource.archivo ? resource.archivo : null,
           estado: resource.estado,
         })),
 
@@ -70,7 +67,6 @@ class contentsRepository {
       const contentData = {
         idcontenido: parseInt(content.idcontenido),
         titulo: content.titulo,
-        descripcion: content.descripcion,
         sesion: content.sesion.sesion,
         idsesion: parseInt(content.sesion.idsesion),
 
@@ -79,9 +75,7 @@ class contentsRepository {
         .map((resource) => ({
           idrecurso: parseInt(resource.idrecurso),
           nombre: resource.nombre,
-          //tipo_recurso: resource.tipo_recurso,
           url: resource.url ? resource.url : null,
-          //archivo: resource.archivo ? resource.archivo : null,
           estado: resource.estado,
         })),
 
@@ -98,10 +92,10 @@ class contentsRepository {
 
   async createContent(dataContent) {
     try {
-      const { titulo } = dataContent;
+      const { titulo, idsesion } = dataContent;
 
       const contentExists = await Content.findOne({
-        where: { titulo, estado: 1 },
+        where: { titulo, idsesion, estado: 1 },
       });
 
       if (contentExists) { return false; }
@@ -136,7 +130,6 @@ class contentsRepository {
 
       const { 
         titulo, 
-        descripcion, 
         url_video,
         minutos_video,
       } = dataContent;
@@ -150,7 +143,6 @@ class contentsRepository {
       if (titulo && titulo !== content.titulo) {
         content.titulo = titulo;
       }
-      content.descripcion = descripcion;
       content.url_video = url_video;
       content.minutos_video = minutos_video;
       await content.save();

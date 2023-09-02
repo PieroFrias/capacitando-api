@@ -13,10 +13,6 @@ const Content = connection.define('contenido', {
     allowNull: false,
     unique: true
   },
-  descripcion: {
-    type: Sequelize.TEXT,
-    allowNull: true,
-  },
   idsesion: {
     type: Sequelize.INTEGER,
     allowNull: false,
