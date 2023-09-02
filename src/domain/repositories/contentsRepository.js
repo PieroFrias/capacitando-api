@@ -2,7 +2,6 @@ import { Op } from "sequelize";
 import Content from "../../infraestructure/models/contentModel.js";
 import Session from "../../infraestructure/models/sessionModel.js";
 import Course from "../../infraestructure/models/courseModel.js";
-import Resource from "../../infraestructure/models/resourceModel.js";
 
 class contentsRepository {
   constructor(connection) {
@@ -23,7 +22,7 @@ class contentsRepository {
 
       const contents = await Content.findAll({
         where: whereCondition,
-        include: [Session, Resource],
+        include: [Session],
         order: [["idcontenido", "DESC"]],
       });
 
@@ -34,16 +33,6 @@ class contentsRepository {
         titulo: content.titulo,
         sesion: content.sesion.nombre_sesion,
         idsesion: parseInt(content.sesion.idsesion),
-
-        recursos: content.recursos
-        .filter((resource) => resource.estado == 1)
-        .map((resource) => ({
-          idrecurso: parseInt(resource.idrecurso),
-          nombre: resource.nombre,
-          url: resource.url ? resource.url : null,
-          estado: resource.estado,
-        })),
-
         url_video: content.url_video,
         minutos_video: content.minutos_video,
         estado: content.estado,
@@ -59,7 +48,7 @@ class contentsRepository {
     try {
       const content = await Content.findOne({
         where: { estado: 1, idcontenido, },
-        include: [Session, Resource],
+        include: [Session],
       });
 
       if (!content) { return false; }
@@ -69,16 +58,6 @@ class contentsRepository {
         titulo: content.titulo,
         sesion: content.sesion.sesion,
         idsesion: parseInt(content.sesion.idsesion),
-
-        recursos: content.recursos
-        .filter((resource) => resource.estado == 1)
-        .map((resource) => ({
-          idrecurso: parseInt(resource.idrecurso),
-          nombre: resource.nombre,
-          url: resource.url ? resource.url : null,
-          estado: resource.estado,
-        })),
-
         url_video: content.url_video,
         minutos_video: content.minutos_video,
         estado: content.estado,
@@ -173,18 +152,12 @@ class contentsRepository {
     try {
       const content = await Content.findOne({
         where: { idcontenido, estado: 1 },
-        include: [Resource],
       });
 
       if (!content) { return false; }
 
       content.estado = 0;
       await content.save();
-
-      for (const resource of content.recursos) {
-        resource.estado = 0;
-        await resource.save();
-      }
 
       const session = await Session.findOne({
         where: { idsesion: content.idsesion },

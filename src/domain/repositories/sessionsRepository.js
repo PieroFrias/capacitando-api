@@ -3,7 +3,6 @@ import Session from "../../infraestructure/models/sessionModel.js";
 import Course from "../../infraestructure/models/courseModel.js";
 import CourseUser from "../../infraestructure/models/courseUserModel.js";
 import Content from "../../infraestructure/models/contentModel.js";
-import Resource from "../../infraestructure/models/resourceModel.js";
 
 class sessionsRepository {
   constructor(connection) {
@@ -163,10 +162,7 @@ class sessionsRepository {
       const session = await Session.findOne({
         where: { idsesion, estado: 1 },
         include: [
-          {
-            model: Content,
-            include: [{ model: Resource }]
-          },
+          { model: Content },
           { 
             model: Course,
             where:{ estado: 1 } 
@@ -188,11 +184,6 @@ class sessionsRepository {
       for (const content of session.contenidos) {
         content.estado = 0;
         await content.save();
-  
-        for (const resource of content.recursos) {
-          resource.estado = 0;
-          await resource.save();
-        }
       }
 
       const course = await Course.findOne({
