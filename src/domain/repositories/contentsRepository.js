@@ -171,7 +171,7 @@ class contentsRepository {
       course.hora_duracion = ((course.hora_duracion * 60) - (content.minutos_video)) / 60;
       await course.save();
 
-      return content;
+      return true;
     } catch (error) {
       throw error;
     }
