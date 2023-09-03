@@ -458,7 +458,7 @@ class coursesRepository {
       }
 
       await course.save();
-      return course;
+      return true;
     } catch (error) {
       throw error;
     }
