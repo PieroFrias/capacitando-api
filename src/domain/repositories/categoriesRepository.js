@@ -100,14 +100,14 @@ class categorysRepository {
           }
         ]
       });
-
+      
       if (category && category.cursos.length > 0) { return false; }
-
+      
       const deleteCategory = await Category.findByPk(idcategoria);
       deleteCategory.estado = 0;
 
       await deleteCategory.save();
-      return category;
+      return true;
     } catch (error) {
       throw error;
     }

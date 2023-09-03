@@ -210,16 +210,19 @@ class usersRepository {
       if (!comprobarPass) { return false; }
 
       if (usuario && usuario !== user.usuario) {
-        const newUserName = usuario.toLowerCase().replace(/\s/g, "_");
-        const oldUserName = user.usuario.toLowerCase().replace(/\s/g, "_");
-        const imgExtension = path.extname(user.foto);
+        if (user.foto !== null) {
+          const newUserName = usuario.toLowerCase().replace(/\s/g, "_");
+          const oldUserName = user.usuario.toLowerCase().replace(/\s/g, "_");
+          const imgExtension = path.extname(user.foto);
+  
+          const oldImagePath = `src/infraestructure/storage/local/usuarios/${oldUserName}${imgExtension}`;
+          const newImagePath = `src/infraestructure/storage/local/usuarios/${newUserName}${imgExtension}`;
+          fs.renameSync(oldImagePath, newImagePath); 
 
-        const oldImagePath = `src/infraestructure/storage/local/usuarios/${oldUserName}${imgExtension}`;
-        const newImagePath = `src/infraestructure/storage/local/usuarios/${newUserName}${imgExtension}`;
-        fs.renameSync(oldImagePath, newImagePath);
+          user.foto = `${newUserName}${imgExtension}`;
+        }
         
         user.usuario = usuario;
-        user.foto = `${newUserName}${imgExtension}`;
       }
       if (correo && correo !== user.correo) {
         user.correo = correo;
@@ -255,15 +258,20 @@ class usersRepository {
         throw new Error('No tienes permisos para editar este perfil');
       }
 
-      const oldImageExtension = path.extname(user.foto);
-      const newImageExtension = path.extname(newImage);
+      if (user.foto == null) {
+        user.foto = newImage;
+      } else {
+        const oldImageExtension = path.extname(user.foto);
+        const newImageExtension = path.extname(newImage);
+  
+        if (newImageExtension !== oldImageExtension) {
+          const oldImagePath = `src/infraestructure/storage/local/usuarios/${user.foto}`;
+          fs.unlinkSync(oldImagePath);
 
-      if (newImageExtension !== oldImageExtension) {
-        const oldImagePath = `src/infraestructure/storage/local/usuarios/${user.foto}`;
-        fs.unlinkSync(oldImagePath);
+          user.foto = newImage;
+        }
       }
 
-      user.foto = newImage;
 
       await user.save();
       return user;

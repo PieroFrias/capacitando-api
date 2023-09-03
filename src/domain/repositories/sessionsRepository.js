@@ -194,7 +194,7 @@ class sessionsRepository {
       course.hora_duracion = ((course.hora_duracion * 60) - session.contenidos.reduce((sum, content) => sum + content.minutos_video, 0)) / 60;
   
       await course.save();
-      return session;
+      return true;
     } catch (error) {
       throw error;
     }
