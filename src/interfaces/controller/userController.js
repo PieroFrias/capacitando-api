@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 import UsersService from "../../application/services/usersService.js";
-import UsersRepository from "../../domain/repositories/usersRepository.js";
+import UsersRepository from "../../domain/repositories/usersrepository.js";
 import generarJWT from "../../utils/generarJWT.js";
 import deleteImage from "../../utils/deleteImage.js";
 import connection from "../../infraestructure/config/db.js";
@@ -75,7 +75,7 @@ const createUser = async (req, res) => {
     if (user) {
       res.json({ message: "Usuario creado exitosamente" });
     } else {
-      res.status(400).json({ error: "El nombre de usuario ya está en uso" });
+      res.status(400).json({ error: "El nombre de usuario, DNI y/o correo ya están registrados" });
     }
   } catch (error) {
     console.error(error);
