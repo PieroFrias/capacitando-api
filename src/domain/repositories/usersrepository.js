@@ -126,10 +126,10 @@ class usersRepository {
 
   async createUser(dataUser) {
     try {
-      const { usuario } = dataUser;
+      const { usuario, dni, correo } = dataUser;
 
       const userExists = await User.findOne({
-        where: { usuario, estado: 1, },
+        where: { usuario, dni, correo, estado: 1, },
       });
 
       if (userExists) { return false; }
@@ -183,6 +183,7 @@ class usersRepository {
 
       const name = usuario ? await User.findOne({ where: { usuario, estado: 1 } }) : null;
       const email = correo ? await User.findOne({ where: { correo, estado: 1 } }) : null;
+      const dniUser = dni ? await User.findOne({ where: { dni, estado: 1 } }) : null;
 
       if (!user) {
         throw new Error('Usuario no encontrado');
@@ -196,6 +197,10 @@ class usersRepository {
         throw new Error('La dirección de correo electrónico ya está en uso');
       }
       
+      if(dniUser && dniUser.dni !== user.dni) {
+        throw new Error('El DNI ya está en uso');
+      }
+
       if (userRol !== 1 && idUser !== user.idusuario) {
         throw new Error('No tienes permisos para editar este perfil');
       }
@@ -226,6 +231,9 @@ class usersRepository {
       }
       if (correo && correo !== user.correo) {
         user.correo = correo;
+      }
+      if (dni && dni !== user.dni) {
+        user.dni = dni;        
       }
       if (comprobarPass !== 1) {
         user.password = newPassword; 

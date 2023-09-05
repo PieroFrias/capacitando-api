@@ -157,7 +157,7 @@ class sessionsRepository {
     }
   }
 
-  async changeStatusSession(idsesion, userId) {
+  async changeStatusSession(idsesion, userId) {1
     try {
       const session = await Session.findOne({
         where: { idsesion, estado: 1 },
@@ -191,8 +191,11 @@ class sessionsRepository {
       });
 
       course.total_clases -= session.contenidos.length;
-      course.hora_duracion = ((course.hora_duracion * 60) - session.contenidos.reduce((sum, content) => sum + content.minutos_video, 0)) / 60;
+      course.hora_duracion = ((parseFloat(course.hora_duracion) * 60) - session.contenidos.reduce((sum, content) => sum + content.minutos_video, 0)) / 60;
   
+      course.total_clases < 0 ? course.total_clases = 0 : course.total_clases;
+      course.hora_duracion < 0 ? course.hora_duracion = 0 : course.hora_duracion;
+
       await course.save();
       return true;
     } catch (error) {

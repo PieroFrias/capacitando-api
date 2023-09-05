@@ -10,7 +10,7 @@ class contentsRepository {
 
   async getAllContents(idsesion, dataSearch) {
     try {
-      let whereCondition = { estado: 1, idsesion: idsesion, };
+      let whereCondition = { estado: 1, idsesion: idsesion };
 
       const { search } = dataSearch;
       if (search) {
@@ -18,7 +18,7 @@ class contentsRepository {
           { titulo: { [Op.like]: `%${search}%` } },
           { descripcion: { [Op.like]: `%${search}%` } },
         ];
-      };
+      }
 
       const contents = await Content.findAll({
         where: whereCondition,
@@ -26,7 +26,9 @@ class contentsRepository {
         order: [["idcontenido", "DESC"]],
       });
 
-      if (contents.length <= 0) { return false; }
+      if (contents.length <= 0) {
+        return false;
+      }
 
       const contentsData = contents.map((content) => ({
         idcontenido: parseInt(content.idcontenido),
@@ -47,11 +49,13 @@ class contentsRepository {
   async getContentDetail(idcontenido) {
     try {
       const content = await Content.findOne({
-        where: { estado: 1, idcontenido, },
+        where: { estado: 1, idcontenido },
         include: [Session],
       });
 
-      if (!content) { return false; }
+      if (!content) {
+        return false;
+      }
 
       const contentData = {
         idcontenido: parseInt(content.idcontenido),
@@ -77,7 +81,9 @@ class contentsRepository {
         where: { titulo, idsesion, estado: 1 },
       });
 
-      if (contentExists) { return false; }
+      if (contentExists) {
+        return false;
+      }
 
       const content = await Content.create(dataContent);
 
@@ -89,8 +95,11 @@ class contentsRepository {
         where: { idcurso: session.idcurso },
       });
 
-      course.total_clases = course.total_clases + 1; 
-      course.hora_duracion = ((course.hora_duracion * 60) + content.minutos_video) / 60;
+      course.total_clases = course.total_clases + 1;
+      course.hora_duracion =
+        (parseFloat(course.hora_duracion) * 60 +
+          parseFloat(content.minutos_video)) /
+        60;
       await course.save();
 
       return content;
@@ -107,15 +116,16 @@ class contentsRepository {
 
       const current_min_video = content.minutos_video;
 
-      const { 
-        titulo, 
-        url_video,
-        minutos_video,
-      } = dataContent;
+      const { titulo, url_video, minutos_video } = dataContent;
 
-      const contentTitle = titulo ? await Content.findOne({ where: { titulo, estado: 1 } }) : null;
+      const contentTitle = titulo
+        ? await Content.findOne({ where: { titulo, estado: 1 } })
+        : null;
 
-      if (!content || (contentTitle && contentTitle.titulo !== content.titulo)) {
+      if (
+        !content ||
+        (contentTitle && contentTitle.titulo !== content.titulo)
+      ) {
         return false;
       }
 
@@ -135,9 +145,15 @@ class contentsRepository {
       });
 
       if (current_min_video > minutos_video) {
-        course.hora_duracion = ((course.hora_duracion * 60) - (current_min_video - minutos_video)) / 60;
+        course.hora_duracion =
+          (parseFloat(course.hora_duracion) * 60 -
+            (parseFloat(current_min_video) - parseFloat(minutos_video))) /
+          60;
       } else if (current_min_video < minutos_video) {
-        course.hora_duracion = ((course.hora_duracion * 60) + (minutos_video - current_min_video)) / 60;
+        course.hora_duracion =
+          (parseFloat(course.hora_duracion) * 60 +
+            (parseFloat(minutos_video) - parseFloat(current_min_video))) /
+          60;
       }
 
       await course.save();
@@ -154,7 +170,9 @@ class contentsRepository {
         where: { idcontenido, estado: 1 },
       });
 
-      if (!content) { return false; }
+      if (!content) {
+        return false;
+      }
 
       content.estado = 0;
       await content.save();
@@ -168,7 +186,8 @@ class contentsRepository {
       });
 
       course.total_clases = course.total_clases - 1;
-      course.hora_duracion = ((course.hora_duracion * 60) - (content.minutos_video)) / 60;
+      course.hora_duracion =
+        (parseFloat(course.hora_duracion) * 60 - parseFloat(content.minutos_video)) / 60;
       await course.save();
 
       return true;
