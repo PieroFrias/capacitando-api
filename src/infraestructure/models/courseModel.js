@@ -24,10 +24,12 @@ const Course = connection.define('curso', {
   hora_duracion: {
     type: Sequelize.DECIMAL,
     allowNull: true,
+    defaultValue: 0,
   },
   total_clases: {
     type: Sequelize.INTEGER,
     allowNull: true,
+    defaultValue: 0,
   },
   descripcion: {
     type: Sequelize.TEXT,

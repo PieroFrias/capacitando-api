@@ -54,10 +54,15 @@ class coursesRepository {
 
       const courses = await Course.findAll({
         where: whereCondition,
-        include: [{
-          model: Category,
-          where: categoryFilter,
-        }],
+        include: [
+          {
+            model: Category,
+            where: categoryFilter,
+          },
+          {
+            model: Session,
+          }
+        ],
         order: [["updated_at", "DESC"]],
         distinct: true,
       });
@@ -74,6 +79,7 @@ class coursesRepository {
         estado: course.estado,
         hora_duracion: course.hora_duracion,
         total_clases: course.total_clases,
+        total_sesiones: course.sesions.filter(session => session.estado == 1).length,
 
         url_portada: course.url_portada
           ? `${process.env.DOMAIN}/${process.env.DATA}/cursos/${course.url_portada}`
@@ -129,10 +135,15 @@ class coursesRepository {
 
       const courses = await Course.findAndCountAll({
         where: whereCondition,
-        include: [{
-          model: Category,
-          where: categoryFilter,
-        }],
+        include: [
+          {
+            model: Category,
+            where: categoryFilter,
+          },
+          {
+            model: Session
+          }
+        ],
         order: [["updated_at", "DESC"]],
         offset,
         limit: pageSize,
@@ -151,6 +162,7 @@ class coursesRepository {
         estado: course.estado,
         hora_duracion: course.hora_duracion,
         total_clases: course.total_clases,
+        total_sesiones: course.sesions.filter(session => session.estado == 1).length,
 
         url_portada: course.url_portada
           ? `${process.env.DOMAIN}/${process.env.DATA}/cursos/${course.url_portada}`
@@ -223,6 +235,7 @@ class coursesRepository {
         hora_duracion: course.hora_duracion,
         total_clases: course.total_clases,
 
+        total_sesiones: course.sesions.filter(isActiveSession).length,
         sesiones: course.sesions
           .filter(isActiveSession)
           .map((session) => ({
