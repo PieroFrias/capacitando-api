@@ -128,11 +128,19 @@ class usersRepository {
     try {
       const { usuario, dni, correo } = dataUser;
 
-      const userExists = await User.findOne({
-        where: { usuario, dni, correo, estado: 1, },
+      const userName = await User.findOne({
+        where: { usuario, estado: 1, },
       });
 
-      if (userExists) { return false; }
+      const userDni = await User.findOne({
+        where: { dni, estado: 1, },
+      });
+
+      const userEmail = await User.findOne({
+        where: { correo, estado: 1, },
+      });
+
+      if (userName || userDni || userEmail) { return false; }
 
       const user = await User.create(dataUser);
       return user;
